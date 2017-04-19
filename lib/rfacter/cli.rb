@@ -1,9 +1,10 @@
 require 'rfacter'
 
+require_relative 'config'
+
 module RFacter::CLI
-  def self.run(args)
-    puts "RFacter v#{RFacter::VERSION}"
-    puts "Hello, world!"
+  def self.run(argv)
+    args = RFacter::Config.configure_from_argv!(argv)
 
     exit 0
   end

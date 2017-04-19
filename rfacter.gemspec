@@ -14,6 +14,8 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.bindir = 'bin'
   s.executables = ['rfacter']
+
+  s.add_development_dependency 'inch',                               '~> 0.7'
 end
 
 # vim:ft=ruby
