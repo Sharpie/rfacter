@@ -12,6 +12,8 @@ Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.files = Dir['bin/*'] + Dir['lib/**/*.rb']
   s.require_paths = ['lib']
+  s.bindir = 'bin'
+  s.executables = ['rfacter']
 end
 
 # vim:ft=ruby

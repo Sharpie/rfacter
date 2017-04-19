@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'rfacter/cli'
+
+RFacter::CLI.run(ARGV)
