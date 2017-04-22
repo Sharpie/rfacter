@@ -20,6 +20,10 @@ module RFacter::CLI
 
     logger.info('cli::run') { "Configured nodes: #{@config.nodes.values.map(&:hostname)}" }
 
+    hostnames = @config.nodes.values.map {|n| n.execute('hostname')}
+
+    puts hostnames.map {|n| n.value.stdout.chomp}
+
     exit 0
   end
 end

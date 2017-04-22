@@ -15,6 +15,9 @@ Gem::Specification.new do |s|
   s.bindir = 'bin'
   s.executables = ['rfacter']
 
+  s.add_dependency 'train',                                       '~> 0.23.0'
+  s.add_dependency 'concurrent-ruby',                             '~> 1.0'
+
   s.add_development_dependency 'inch',                               '~> 0.7'
 end
 
