@@ -1,9 +1,11 @@
 require 'optparse'
+require 'optparse/uri'
 require 'logger'
 
 require 'rfacter'
 
 require_relative 'config/settings'
+require_relative 'node'
 
 # Stores and sets global configuration
 #
@@ -71,6 +73,11 @@ module RFacter::Config
 
     parser.on('-d', '--debug', 'Raise log level to DEBUG.') do
       settings.logger.level = Logger::DEBUG
+    end
+
+    parser.on('-I', '=MANDATORY', URI, 'Add a node by URI.') do |uri|
+      node = RFacter::Node.new(uri)
+      settings.nodes[node.hostname] = node
     end
 
     parser.parse!(args)
