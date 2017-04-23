@@ -10,10 +10,9 @@ require 'rfacter'
 # @api private
 class RFacter::Util::Collection
 
-  def initialize(internal_loader, external_loader)
+  def initialize(internal_loader)
     @facts = Hash.new
     @internal_loader = internal_loader
-    @external_loader = external_loader
   end
 
   # Return a fact object by name.
@@ -87,7 +86,6 @@ class RFacter::Util::Collection
   # Flush all cached values.
   def flush
     @facts.each { |name, fact| fact.flush }
-    @external_facts_loaded = nil
   end
 
   # Return a list of all of the facts.
@@ -98,21 +96,15 @@ class RFacter::Util::Collection
 
   def load(name)
     internal_loader.load(name)
-    load_external_facts
   end
 
   # Load all known facts.
   def load_all
     internal_loader.load_all
-    load_external_facts
   end
 
   def internal_loader
     @internal_loader
-  end
-
-  def external_loader
-    @external_loader
   end
 
   # Return a hash of all of our facts.
@@ -152,12 +144,5 @@ class RFacter::Util::Collection
 
   def canonicalize(name)
     name.to_s.downcase.to_sym
-  end
-
-  def load_external_facts
-    if ! @external_facts_loaded
-      @external_facts_loaded = true
-      external_loader.load(self)
-    end
   end
 end
