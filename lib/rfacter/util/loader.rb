@@ -7,9 +7,8 @@ require 'facter/util/directory_loader'
 # Load facts on demand.
 class RFacter::Util::Loader
 
-  def initialize(environment_vars = ENV)
+  def initialize
     @loaded = []
-    @environment_vars = environment_vars
   end
 
   # Load all resolutions for a single fact.
@@ -19,7 +18,6 @@ class RFacter::Util::Loader
   def load(fact)
     # Now load from the search path
     shortname = fact.to_s.downcase
-    load_env(shortname)
 
     filename = shortname + ".rb"
 
@@ -39,8 +37,6 @@ class RFacter::Util::Loader
   # @api public
   def load_all
     return if defined?(@loaded_all)
-
-    load_env
 
     paths = search_path
     unless paths.nil?
@@ -73,8 +69,8 @@ class RFacter::Util::Loader
     search_paths = []
     search_paths += $LOAD_PATH.map { |path| File.expand_path('facter', path) }
 
-    if @environment_vars.include?("FACTERLIB")
-      search_paths += @environment_vars["FACTERLIB"].split(File::PATH_SEPARATOR)
+    if ENV.include?("FACTERLIB")
+      search_paths += ENV["FACTERLIB"].split(File::PATH_SEPARATOR)
     end
 
     search_paths.delete_if { |path| ! valid_search_path?(path) }
@@ -130,28 +126,5 @@ class RFacter::Util::Loader
   # @return [Boolean]
   def kernel_load(file)
     Kernel.load(file)
-  end
-
-  # Load facts from the environment.  If no name is provided,
-  # all will be loaded.
-  def load_env(fact = nil)
-    # Load from the environment, if possible
-    @environment_vars.each do |name, value|
-      # Skip anything that doesn't match our regex.
-      next unless name =~ /^facter_?(\w+)$/i
-      env_name = $1
-
-      # If a fact name was specified, skip anything that doesn't
-      # match it.
-      next if fact and env_name != fact
-
-      Facter.add($1) do
-        has_weight 1_000_000
-        setcode { value }
-      end
-
-      # Short-cut, if we are only looking for one value.
-      break if fact
-    end
   end
 end
