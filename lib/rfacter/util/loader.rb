@@ -1,9 +1,11 @@
+require 'rfacter'
+
 require 'facter'
 require 'pathname'
 require 'facter/util/directory_loader'
 
 # Load facts on demand.
-class Facter::Util::Loader
+class RFacter::Util::Loader
 
   def initialize(environment_vars = ENV)
     @loaded = []
