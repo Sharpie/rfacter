@@ -2,11 +2,13 @@ require 'facter'
 require 'facter/util/fact'
 require 'facter/util/loader'
 
+require 'rfacter'
+
 # Manage which facts exist and how we access them.  Largely just a wrapper
 # around a hash of facts.
 #
 # @api private
-class Facter::Util::Collection
+class RFacter::Util::Collection
 
   def initialize(internal_loader, external_loader)
     @facts = Hash.new
