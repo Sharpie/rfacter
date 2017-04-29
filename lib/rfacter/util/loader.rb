@@ -2,7 +2,6 @@ require 'rfacter'
 
 require 'facter'
 require 'pathname'
-require 'facter/util/directory_loader'
 
 # Load facts on demand.
 class RFacter::Util::Loader
@@ -56,34 +55,22 @@ class RFacter::Util::Loader
   #
   # Search paths are gathered from the following sources:
   #
-  # 1. $LOAD_PATH entries are expanded to absolute paths
-  # 2. ENV['FACTERLIB'] is split and used verbatim
-  # 3. Entries from Facter.search_path are used verbatim
+  # 1. A core set of facts from the rfacter/facts directory
+  # 2. ENV['RFACTERLIB'] is split and used verbatim
   #
-  # A warning will be generated for paths in Facter.search_path that are not
+  # A warning will be generated for paths that are not
   # absolute directories.
   #
   # @api public
   # @return [Array<String>]
   def search_path
-    search_paths = []
-    search_paths += $LOAD_PATH.map { |path| File.expand_path('facter', path) }
+    search_paths = [File.expand_path('../../facts', __FILE__)]
 
-    if ENV.include?("FACTERLIB")
-      search_paths += ENV["FACTERLIB"].split(File::PATH_SEPARATOR)
+    if ENV.include?("RFACTERLIB")
+      search_paths += ENV["RFACTERLIB"].split(File::PATH_SEPARATOR)
     end
 
     search_paths.delete_if { |path| ! valid_search_path?(path) }
-
-    Facter.search_path.each do |path|
-      if valid_search_path?(path)
-        search_paths << path
-      else
-        Facter.warn "Excluding #{path} from search path. Fact file paths must be an absolute directory"
-      end
-    end
-
-    search_paths.delete_if { |path| ! File.directory?(path) }
 
     search_paths.uniq
   end
@@ -96,7 +83,7 @@ class RFacter::Util::Loader
   # @param path [String]
   # @return [Boolean]
   def valid_search_path?(path)
-    Pathname.new(path).absolute?
+    Pathname.new(path).absolute? && File.directory?(path)
   end
 
   # Load a file and record is paths to prevent duplicate loads.
