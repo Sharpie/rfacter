@@ -1,12 +1,17 @@
-require 'rfacter'
-
-require 'facter'
 require 'pathname'
+require 'forwardable'
+
+require 'rfacter'
+require_relative '../config'
 
 # Load facts on demand.
 class RFacter::Util::Loader
+  extend Forwardable
 
-  def initialize
+  instance_delegate([:logger] => :@config)
+
+  def initialize(config: RFacter::Config.config, **opts)
+    @config = config
     @loaded = []
   end
 
@@ -102,7 +107,7 @@ class RFacter::Util::Loader
       # Don't store the path if the file can't be loaded
       # in case it's loadable later on.
       @loaded.delete(file)
-      Facter.log_exception(detail, "Error loading fact #{file}: #{detail.message}")
+      logger.error("Error loading fact #{file}: #{detail.message}")
     end
   end
 
