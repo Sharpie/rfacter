@@ -1,8 +1,8 @@
 require 'facter'
 require 'facter/util/fact'
-require 'facter/util/loader'
 
 require 'rfacter'
+require_relative 'loader'
 
 # Manage which facts exist and how we access them.  Largely just a wrapper
 # around a hash of facts.
@@ -10,9 +10,9 @@ require 'rfacter'
 # @api private
 class RFacter::Util::Collection
 
-  def initialize(internal_loader)
+  def initialize(internal_loader = nil)
     @facts = Hash.new
-    @internal_loader = internal_loader
+    @internal_loader = internal_loader || RFacter::Util::Loader.new
   end
 
   # Return a fact object by name.
