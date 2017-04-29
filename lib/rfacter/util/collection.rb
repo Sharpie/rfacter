@@ -2,6 +2,7 @@ require 'facter'
 require 'facter/util/fact'
 
 require 'rfacter'
+require_relative 'dsl'
 require_relative 'loader'
 
 # Manage which facts exist and how we access them.  Largely just a wrapper
@@ -9,10 +10,13 @@ require_relative 'loader'
 #
 # @api private
 class RFacter::Util::Collection
+  # Ensures unqualified namespaces like `Facter` and `Facter::Util` get
+  # re-directed to RFacter shims when the loader calls `instance_eval`
+  include RFacter::Util::DSL
 
-  def initialize(internal_loader = nil)
+  def initialize
     @facts = Hash.new
-    @internal_loader = internal_loader || RFacter::Util::Loader.new
+    @internal_loader = RFacter::Util::Loader.new
   end
 
   # Return a fact object by name.
@@ -35,7 +39,7 @@ class RFacter::Util::Collection
 
     fact
   rescue => e
-    Facter.log_exception(e, "Unable to add fact #{name}: #{e}")
+    ::Facter.log_exception(e, "Unable to add fact #{name}: #{e}")
   end
 
   # Add a resolution mechanism for a named fact.  This does not distinguish
@@ -74,10 +78,10 @@ class RFacter::Util::Collection
     load(name) unless @facts[name]
 
     # Try HARDER
-    internal_loader.load_all unless @facts[name]
+    load_all unless @facts[name]
 
     if @facts.empty?
-      Facter.warnonce("No facts loaded from #{internal_loader.search_path.join(File::PATH_SEPARATOR)}")
+      ::Facter.warnonce("No facts loaded from #{@internal_loader.search_path.join(File::PATH_SEPARATOR)}")
     end
 
     @facts[name]
@@ -95,16 +99,12 @@ class RFacter::Util::Collection
   end
 
   def load(name)
-    internal_loader.load(name)
+    @internal_loader.load(name, self)
   end
 
   # Load all known facts.
   def load_all
-    internal_loader.load_all
-  end
-
-  def internal_loader
-    @internal_loader
+    @internal_loader.load_all(self)
   end
 
   # Return a hash of all of our facts.
@@ -133,7 +133,7 @@ class RFacter::Util::Collection
     fact = @facts[name]
 
     if fact.nil?
-      fact = Facter::Util::Fact.new(name, options)
+      fact = ::Facter::Util::Fact.new(name, options)
       @facts[name] = fact
     else
       fact.extract_ldapname_option!(options)

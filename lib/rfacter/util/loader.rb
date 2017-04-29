@@ -2,9 +2,12 @@ require 'pathname'
 require 'forwardable'
 
 require 'rfacter'
+require_relative 'dsl'
 require_relative '../config'
 
 # Load facts on demand.
+#
+# @api private
 class RFacter::Util::Loader
   extend Forwardable
 
@@ -19,7 +22,7 @@ class RFacter::Util::Loader
   #
   # @api public
   # @param name [Symbol]
-  def load(fact)
+  def load(fact, collection)
     # Now load from the search path
     shortname = fact.to_s.downcase
 
@@ -31,7 +34,7 @@ class RFacter::Util::Loader
         # Load individual files
         file = File.join(dir, filename)
 
-        load_file(file) if File.file?(file)
+        load_file(file, collection) if File.file?(file)
       end
     end
   end
@@ -39,7 +42,7 @@ class RFacter::Util::Loader
   # Load all facts from all directories.
   #
   # @api public
-  def load_all
+  def load_all(collection)
     return if defined?(@loaded_all)
 
     paths = search_path
@@ -48,7 +51,7 @@ class RFacter::Util::Loader
         # dir is already an absolute path
         Dir.glob(File.join(dir, '*.rb')).each do |path|
           # exclude dirs that end with .rb
-          load_file(path) if File.file?(path)
+          load_file(path, collection) if File.file?(path)
         end
       end
     end
@@ -95,28 +98,23 @@ class RFacter::Util::Loader
   #
   # @api private
   # @params file [String] The *absolute path* to the file to load
-  def load_file(file)
+  def load_file(file, collection)
     return if @loaded.include? file
 
     # We have to specify Kernel.load, because we have a load method.
     begin
       # Store the file path so we don't try to reload it
       @loaded << file
-      kernel_load(file)
-    rescue ScriptError => detail
+
+      RFacter::Util::DSL::COLLECTION.value = collection
+      collection.instance_eval(File.read(file))
+    rescue => detail
       # Don't store the path if the file can't be loaded
       # in case it's loadable later on.
       @loaded.delete(file)
-      logger.error("Error loading fact #{file}: #{detail.message}")
+      logger.error("Error loading fact #{file}: #{detail.message}\n" + detail.backtrace.join("\n"))
+    ensure
+      RFacter::Util::DSL::COLLECTION.value = nil
     end
-  end
-
-  # Load and execute the Ruby program specified in the file. This exists
-  # for testing purposes.
-  #
-  # @api private
-  # @return [Boolean]
-  def kernel_load(file)
-    Kernel.load(file)
   end
 end
