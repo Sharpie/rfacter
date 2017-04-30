@@ -12,6 +12,8 @@ require 'rfacter'
 # However, lexical scope is a tricky thing, so "should" is the operative word
 # here.
 #
+# @see https://github.com/puppetlabs/facter/blob/master/Extensibility.md
+#
 # @private
 # @since 0.1.0
 module RFacter::Util::DSL
@@ -22,7 +24,18 @@ module RFacter::Util::DSL
     raise(NameError,<<-EOS)
 A Facter DSL method that manipulates a fact collection was called without the
 collection being set. This usually happens if the DSL method is called directly
-instead of via an instance of Facter::Util::Collection.
+instead of via an instance of RFacter::Util::Collection.
+EOS
+  end
+
+  NODE = Concurrent::ThreadLocalVar.new do
+    # If unset, something attempted to use a Facter DSL method that shells
+    # out for imformation without setting NODE to an instance of
+    # RFacter::Node.
+    raise(NameError,<<-EOS)
+A Facter DSL method that executes shell commands was called without a
+node to execute on being set. This usually happens if the DSL method is called
+directly instead of via an instance of RFacter::Util::Collection.
 EOS
   end
 
@@ -30,6 +43,22 @@ EOS
     # Shim for Facter.add(...)
     def self.add(name, options = {}, &block)
       COLLECTION.value.add(name, options, &block)
+    end
+
+    module Core
+      module Execution
+        # TODO: Implement which
+        # TODO: Impletement ExecutionFailure (just a subclass of StandardError)
+        # TODO: Implement execution options
+
+        def self.exec(command)
+          execute(command, :on_fail => nil)
+        end
+
+        def self.execute(command, options = {})
+          NODE.value.execute(command).stdout.chomp
+        end
+      end
     end
   end
 end
