@@ -1,6 +1,5 @@
-require 'logger'
-
 require 'rfacter'
+require_relative '../util/logger'
 
 # Class for top-level RFacter configuration
 #
@@ -24,7 +23,7 @@ class RFacter::Config::Settings
   attr_reader :nodes
 
   def initialize(**options)
-    @logger = Logger.new($stderr)
+    @logger = RFacter::Util::Logger.new($stderr)
     @logger.level = Logger::WARN
 
     @nodes = Hash.new
