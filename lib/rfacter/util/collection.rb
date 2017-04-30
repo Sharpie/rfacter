@@ -1,9 +1,9 @@
-require 'facter'
-require 'facter/util/fact'
+require 'facter' # TODO: Remove once warnonce and log_exception are implemented
 
 require 'rfacter'
 require_relative 'dsl'
 require_relative 'loader'
+require_relative 'fact'
 
 # Manage which facts exist and how we access them.  Largely just a wrapper
 # around a hash of facts.
@@ -136,7 +136,7 @@ class RFacter::Util::Collection
     fact = @facts[name]
 
     if fact.nil?
-      fact = ::Facter::Util::Fact.new(name, options)
+      fact = RFacter::Util::Fact.new(name, options)
       @facts[name] = fact
     else
       fact.extract_ldapname_option!(options)

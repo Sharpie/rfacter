@@ -1,6 +1,8 @@
-require 'facter'
+require 'facter' # TODO: Remove once warnonce and log_exception are implemented
 require 'facter/util/resolution'
 require 'facter/core/aggregate'
+
+require 'rfacter'
 
 # This class represents a fact. Each fact has a name and multiple
 # {Facter::Util::Resolution resolutions}.
@@ -8,7 +10,7 @@ require 'facter/core/aggregate'
 # Create facts using {Facter.add}
 #
 # @api public
-class Facter::Util::Fact
+class RFacter::Util::Fact
   # The name of the fact
   # @return [String]
   attr_accessor :name
@@ -69,7 +71,7 @@ class Facter::Util::Fact
 
     resolve
   rescue => e
-    Facter.log_exception(e, "Unable to add resolve #{resolution_name.inspect} for fact #{@name}: #{e.message}")
+    ::Facter.log_exception(e, "Unable to add resolve #{resolution_name.inspect} for fact #{@name}: #{e.message}")
   end
 
   # Retrieve an existing resolution by name
@@ -103,7 +105,7 @@ class Facter::Util::Fact
     return @value if @value
 
     if @resolves.empty?
-      Facter.debug "No resolves for %s" % @name
+      ::Facter.debug "No resolves for %s" % @name
       return nil
     end
 
@@ -123,7 +125,7 @@ class Facter::Util::Fact
   # @deprecated
   def extract_ldapname_option!(options)
     if options[:ldapname]
-      Facter.warnonce("ldapname is deprecated and will be removed in a future version")
+      ::Facter.warnonce("ldapname is deprecated and will be removed in a future version")
       self.ldapname = options.delete(:ldapname)
     end
   end
@@ -168,13 +170,13 @@ class Facter::Util::Fact
 
   def announce_when_no_suitable_resolution(resolutions)
     if resolutions.empty?
-      Facter.debug "Found no suitable resolves of %s for %s" % [@resolves.length, @name]
+      ::Facter.debug "Found no suitable resolves of %s for %s" % [@resolves.length, @name]
     end
   end
 
   def announce_when_no_value_found(value)
     if value.nil?
-      Facter.debug("value for %s is still nil" % @name)
+      ::Facter.debug("value for %s is still nil" % @name)
     end
   end
 
@@ -189,9 +191,9 @@ class Facter::Util::Fact
     else
       case resolution_type
       when :simple
-        resolve = Facter::Util::Resolution.new(resolution_name, self)
+        resolve = ::Facter::Util::Resolution.new(resolution_name, self)
       when :aggregate
-        resolve = Facter::Core::Aggregate.new(resolution_name, self)
+        resolve = ::Facter::Core::Aggregate.new(resolution_name, self)
       else
         raise ArgumentError, "Expected resolution type to be one of (:simple, :aggregate) but was #{resolution_type}"
       end
