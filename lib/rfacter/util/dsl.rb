@@ -106,8 +106,9 @@ EOS
     # Facter::Util DSL methods
     #
     # @todo Implement Facter::Util::Resolution
-    # @todo Implement Facter::Util::Fact
     module Util
+      require_relative 'fact'
+      Fact = ::RFacter::Util::Fact
     end
   end
 end
