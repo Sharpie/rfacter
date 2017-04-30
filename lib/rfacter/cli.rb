@@ -1,9 +1,11 @@
 require 'forwardable'
+require 'json'
 
 require 'rfacter'
 
 require_relative 'config'
 require_relative 'node'
+require_relative 'util/collection'
 
 module RFacter::CLI
   extend SingleForwardable
@@ -20,9 +22,21 @@ module RFacter::CLI
 
     logger.info('cli::run') { "Configured nodes: #{@config.nodes.values.map(&:hostname)}" }
 
-    hostnames = @config.nodes.values.map {|n| n.execute('hostname')}
+    collection = RFacter::Util::Collection.new
 
-    puts hostnames.map {|n| n.value.stdout.chomp}
+    facts = @config.nodes.values.inject(Hash.new) do |h, node|
+      node_facts = Hash.new
+      node_facts['hostname'] = collection.value('hostname', node)
+
+      # TODO: Implement per-node fact values.
+      collection.flush
+
+      h[node.hostname] = node_facts
+      h
+    end
+
+
+    puts JSON.pretty_generate(facts)
 
     exit 0
   end

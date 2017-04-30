@@ -10,8 +10,8 @@ require 'concurrent'
 
 # Interface to a local or remote host
 #
-# @note This class should provide an abstract to different transport backends
-#   like Train, Vagrant, Chloride, etc.
+# @note This class should be refacter to provide an abstracted interface to
+#   different transport backends like Train, Vagrant, Chloride, etc.
 #
 # @since 0.1.0
 class RFacter::Node
@@ -78,21 +78,17 @@ class RFacter::Node
 
   # Execute a command on the node asynchronously
   #
-  # This method initiates the execution of a command line and returns a
-  # future that can be used to retrieve the result once execution completes.
-  # This allows several remote commands to be dispatched and their results
-  # collected.
+  # This method initiates the execution of a command line and returns an
+  # object representing the result.
   #
   # @param command [String] The command string to execute.
   #
-  # @return [Concurrent::Future] A {Concurrent::Future} that can be used
-  #   to access the result of the command.
+  # @return [Train::Extras::CommandResult] The result of the command including
+  #   stdout, stderr and exit code.
   def execute(command)
-    Concurrent::Future.execute do
-      # TODO: Ensure the underlying connection is re-used and re-used in
-      # a threadsafe manner.
-      @transport.connection.run_command(command)
-    end
+    # TODO: Ensure the underlying connection is re-used and re-used in
+    # a threadsafe manner.
+    @transport.connection.run_command(command)
   end
 
 end
