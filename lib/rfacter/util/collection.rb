@@ -1,4 +1,4 @@
-require 'facter' # TODO: Remove once warnonce and log_exception are implemented
+require 'forwardable'
 
 require 'rfacter'
 require_relative 'dsl'
@@ -13,8 +13,12 @@ class RFacter::Util::Collection
   # Ensures unqualified namespaces like `Facter` and `Facter::Util` get
   # re-directed to RFacter shims when the loader calls `instance_eval`
   include RFacter::Util::DSL
+  extend Forwardable
 
-  def initialize
+  instance_delegate([:logger] => :@config)
+
+  def initialize(config: RFacter::Config.config, **opts)
+    @config = config
     @facts = Hash.new
     @internal_loader = RFacter::Util::Loader.new
   end
@@ -39,7 +43,7 @@ class RFacter::Util::Collection
 
     fact
   rescue => e
-    ::Facter.log_exception(e, "Unable to add fact #{name}: #{e}")
+    logger.log_exception(e, "Unable to add fact #{name}: #{e}")
   end
 
   # Add a resolution mechanism for a named fact.  This does not distinguish
@@ -81,7 +85,7 @@ class RFacter::Util::Collection
     load_all unless @facts[name]
 
     if @facts.empty?
-      ::Facter.warnonce("No facts loaded from #{@internal_loader.search_path.join(File::PATH_SEPARATOR)}")
+      logger.warnonce("No facts loaded from #{@internal_loader.search_path.join(File::PATH_SEPARATOR)}")
     end
 
     @facts[name]

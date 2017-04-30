@@ -1,6 +1,7 @@
 require 'concurrent'
 
 require 'rfacter'
+require_relative '../config'
 
 # Facter compatibility layer
 #
@@ -43,6 +44,26 @@ EOS
     # Shim for Facter.add(...)
     def self.add(name, options = {}, &block)
       COLLECTION.value.add(name, options, &block)
+    end
+
+    def self.debug(msg)
+      ::RFacter::Config.config.logger.debug(msg)
+    end
+
+    def self.debugonce(msg)
+      ::RFacter::Config.config.logger.debugonce(msg)
+    end
+
+    def self.log_exception(exception, message = nil)
+      ::RFacter::Config.config.logger.log_exception(exception, messge)
+    end
+
+    def self.warn(msg)
+      ::RFacter::Config.config.logger.warn(msg)
+    end
+
+    def self.warnonce(msg)
+      ::RFacter::Config.config.logger.warnonce(msg)
     end
 
     module Core

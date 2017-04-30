@@ -1,4 +1,6 @@
-require 'facter' # TODO: Remove once warnonce and log_exception are implemented
+require 'forwardable'
+
+require 'facter' # TODO: Remove once resolutions and aggregates are implemented.
 require 'facter/util/resolution'
 require 'facter/core/aggregate'
 
@@ -11,6 +13,10 @@ require 'rfacter'
 #
 # @api public
 class RFacter::Util::Fact
+  extend Forwardable
+
+  instance_delegate([:logger] => :@config)
+
   # The name of the fact
   # @return [String]
   attr_accessor :name
@@ -26,8 +32,9 @@ class RFacter::Util::Fact
   # @option options [String] :ldapname set the ldapname property on the fact
   #
   # @api private
-  def initialize(name, options = {})
+  def initialize(name, config: RFacter::Config.config, **options)
     @name = name.to_s.downcase.intern
+    @config = config
 
     extract_ldapname_option!(options)
 
@@ -71,7 +78,7 @@ class RFacter::Util::Fact
 
     resolve
   rescue => e
-    ::Facter.log_exception(e, "Unable to add resolve #{resolution_name.inspect} for fact #{@name}: #{e.message}")
+    logger.log_exception(e, "Unable to add resolve #{resolution_name.inspect} for fact #{@name}: #{e.message}")
   end
 
   # Retrieve an existing resolution by name
@@ -105,7 +112,7 @@ class RFacter::Util::Fact
     return @value if @value
 
     if @resolves.empty?
-      ::Facter.debug "No resolves for %s" % @name
+      logger.debug("No resolves for #{@name}")
       return nil
     end
 
@@ -125,7 +132,7 @@ class RFacter::Util::Fact
   # @deprecated
   def extract_ldapname_option!(options)
     if options[:ldapname]
-      ::Facter.warnonce("ldapname is deprecated and will be removed in a future version")
+      logger.warnonce("ldapname is deprecated and will be removed in a future version")
       self.ldapname = options.delete(:ldapname)
     end
   end
@@ -170,13 +177,13 @@ class RFacter::Util::Fact
 
   def announce_when_no_suitable_resolution(resolutions)
     if resolutions.empty?
-      ::Facter.debug "Found no suitable resolves of %s for %s" % [@resolves.length, @name]
+      logger.debug("Found no suitable resolves of #{@resolves.length} for #{@name}")
     end
   end
 
   def announce_when_no_value_found(value)
     if value.nil?
-      ::Facter.debug("value for %s is still nil" % @name)
+      logger.debug("value for #{name} is still nil")
     end
   end
 

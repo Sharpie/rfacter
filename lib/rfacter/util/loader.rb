@@ -112,7 +112,7 @@ class RFacter::Util::Loader
       # Don't store the path if the file can't be loaded
       # in case it's loadable later on.
       @loaded.delete(file)
-      logger.error("Error loading fact #{file}: #{detail.message}\n" + detail.backtrace.join("\n"))
+      logger.log_exception(detail, "Error loading fact #{file}: #{detail.message}")
     ensure
       RFacter::Util::DSL::COLLECTION.value = nil
     end
