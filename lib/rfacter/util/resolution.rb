@@ -1,9 +1,14 @@
+require 'forwardable'
+
 require 'facter/util/confine'
 require 'facter/util/config'
 require 'facter/util/normalization'
 require 'facter/core/execution'
 require 'facter/core/resolvable'
 require 'facter/core/suitable'
+
+require 'rfacter'
+require_relative '../config'
 
 # This represents a fact resolution. A resolution is a concrete
 # implementation of a fact. A single fact can have many resolutions and
@@ -16,12 +21,16 @@ require 'facter/core/suitable'
 # satisfied for a fact to be considered _suitable_.
 #
 # @api public
-class Facter::Util::Resolution
+class RFacter::Util::Resolution
+  extend Forwardable
+
+  instance_delegate([:logger] => :@config)
+
   # @api private
   attr_accessor :code
   attr_writer :value
 
-  extend Facter::Core::Execution
+  extend ::Facter::Core::Execution
 
   class << self
     # Expose command execution methods that were extracted into
@@ -32,8 +41,8 @@ class Facter::Util::Resolution
     public :search_paths, :which, :absolute_path?, :expand_command, :with_env, :exec
   end
 
-  include Facter::Core::Resolvable
-  include Facter::Core::Suitable
+  include ::Facter::Core::Resolvable
+  include ::Facter::Core::Suitable
 
   # @!attribute [rw] name
   # The name of this resolution. The resolution name should be unique with
@@ -53,9 +62,10 @@ class Facter::Util::Resolution
   # @return [void]
   #
   # @api private
-  def initialize(name, fact)
+  def initialize(name, fact, config: RFacter::Config.config, **options)
     @name = name
     @fact = fact
+    @config = config
     @confines = []
     @value = nil
     @timeout = 0
@@ -75,7 +85,7 @@ class Facter::Util::Resolution
       msg = "Already evaluated #{@name}"
       msg << " at #{@last_evaluated}" if msg.is_a? String
       msg << ", reevaluating anyways"
-      Facter.warn msg
+      logger.warn msg
     end
 
     instance_eval(&block)
@@ -132,7 +142,7 @@ class Facter::Util::Resolution
   def setcode(string = nil, &block)
     if string
       @code = Proc.new do
-        output = Facter::Core::Execution.execute(string, :on_fail => nil)
+        output = ::Facter::Core::Execution.execute(string, :on_fail => nil)
         if output.nil? or output.empty?
           nil
         else
