@@ -85,10 +85,39 @@ class RFacter::Node
   #
   # @return [Train::Extras::CommandResult] The result of the command including
   #   stdout, stderr and exit code.
+  #
+  # @todo Add support for setting user accounts and environment variables.
   def execute(command)
     # TODO: Ensure the underlying connection is re-used and re-used in
     # a threadsafe manner.
     @transport.connection.run_command(command)
   end
 
+  # Determine if an executable exists and return the path
+  #
+  # @param executable [String] The executable to locate.
+  #
+  # @return [String] The path to the executable if it exists.
+  #
+  # @return [nil] Returned when no matching executable can be located.
+  #
+  # @todo Add support for setting user accounts and environment variables.
+  def which(executable)
+    # TODO: Ensure the underlying connection is re-used and re-used in
+    # a threadsafe manner.
+    connection = @transport.connection
+
+    # TODO: Abstract away from the Train "os" implementation.
+    result = if connection.os.windows?
+      connection.run_command("(Get-Command -TotalCount 1 #{executable}).Path")
+    else
+      connection.run_command("which #{executable}")
+    end
+
+    if (result.exit_status != 0) || (result.stdout.chomp.empty?)
+      nil
+    else
+      result.stdout.chomp
+    end
+  end
 end
