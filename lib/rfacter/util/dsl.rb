@@ -15,6 +15,7 @@ require_relative '../config'
 #
 # @see https://github.com/puppetlabs/facter/blob/master/Extensibility.md
 #
+# @api public
 # @since 0.1.0
 module RFacter::Util::DSL
   COLLECTION = Concurrent::ThreadLocalVar.new do
@@ -89,16 +90,65 @@ EOS
     module Core
       # Shims for Facter::Core::Exection methods
       #
-      # @todo Implement which
-      # @todo Impletement ExecutionFailure (just a subclass of StandardError)
       # @todo Implement execution options
       module Execution
+        # Error raised when :on_fail is set
+        class ExecutionFailure < StandardError; end
+
+        # Try to execute a command and return the output.
+        #
+        # @param code [String] the program to run
+        #
+        # @return [String] the output of the program, or nil if the command
+        #   does not exist or could not be executed.
+        #
+        # @deprecated Use #{execute} instead
         def self.exec(command)
-          execute(command, :on_fail => nil)
+          execute(command, on_fail: nil)
         end
 
-        def self.execute(command, options = {})
-          NODE.value.execute(command).stdout.chomp
+        # Execute a command and return the output of that program.
+        #
+        # @param code [String] the program to run
+        # @param options [Hash]
+        #
+        # @option options [Object] :on_fail How to behave when the command
+        #   could not be run. Specifying `:raise` will raise an error, anything
+        #   else will return that object on failure. Default is `:raise`.
+        #
+        # @raise [RFacter::Util::DSL::Facter::Core::Execution::ExecutionFailure]
+        #   If the command does not exist or could not be executed.
+        #
+        # @return [String] The stdout of the program.
+        #
+        # @return [Object] The value of `:on_fail` if command execution failed
+        #   and `:on_fail` was specified.
+        def self.execute(command, on_fail: :raise, **options)
+          begin
+            output = NODE.value.execute(command).stdout.chomp
+          rescue => detail
+            if on_fail == :raise
+              raise ::RFacter::Util::DSL::Facter::Core::Execution::ExecutionFailure.new,
+                "Failed while executing '#{command}': #{detail.message}"
+            else
+              return on_fail
+            end
+          end
+
+          output
+        end
+
+        # Determines the full path to a binary.
+        #
+        # Returns nil if no matching executable can be found otherwise returns
+        # the expanded pathname.
+        #
+        # @param bin [String] the executable to locate
+        #
+        # @return [String,nil] the full path to the executable or nil if not
+        #   found
+        def self.which(bin)
+          NODE.value.which(bin)
         end
       end
     end
