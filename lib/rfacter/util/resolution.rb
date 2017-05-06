@@ -3,12 +3,12 @@ require 'forwardable'
 require 'facter/util/confine'
 require 'facter/util/config'
 require 'facter/util/normalization'
-require 'facter/core/execution'
 require 'facter/core/resolvable'
 require 'facter/core/suitable'
 
 require 'rfacter'
 require_relative '../config'
+require_relative 'dsl'
 
 # This represents a fact resolution. A resolution is a concrete
 # implementation of a fact. A single fact can have many resolutions and
@@ -30,17 +30,6 @@ class RFacter::Util::Resolution
   attr_accessor :code
   attr_writer :value
 
-  extend ::Facter::Core::Execution
-
-  class << self
-    # Expose command execution methods that were extracted into
-    # Facter::Core::Execution from Facter::Util::Resolution in Facter 2.0.0 for
-    # compatibility.
-    #
-    # @deprecated
-    public :search_paths, :which, :absolute_path?, :expand_command, :with_env, :exec
-  end
-
   include ::Facter::Core::Resolvable
   include ::Facter::Core::Suitable
 
@@ -55,6 +44,14 @@ class RFacter::Util::Resolution
   # @return [Facter::Util::Fact]
   # @api private
   attr_reader :fact
+
+  def which(command)
+    ::RFacter::Util::DSL::Facter::Core::Execution.which(command)
+  end
+
+  def exec(command)
+    ::RFacter::Util::DSL::Facter::Core::Execution.exec(command)
+  end
 
   # Create a new resolution mechanism.
   #
@@ -142,7 +139,7 @@ class RFacter::Util::Resolution
   def setcode(string = nil, &block)
     if string
       @code = Proc.new do
-        output = ::Facter::Core::Execution.execute(string, :on_fail => nil)
+        output = exec(string)
         if output.nil? or output.empty?
           nil
         else
