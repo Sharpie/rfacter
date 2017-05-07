@@ -76,6 +76,14 @@ class RFacter::Node
       logger: logger, **@options)
   end
 
+  # FIXME: For some reason, Train's connection re-use logic isn't working, so a
+  # new connection is being negotiated for each command. File a bug.
+  #
+  # TODO: Ensure connection use is thread-safe.
+  def connection
+    @connection ||= @transport.connection
+  end
+
   # Execute a command on the node asynchronously
   #
   # This method initiates the execution of a command line and returns an
@@ -88,9 +96,7 @@ class RFacter::Node
   #
   # @todo Add support for setting user accounts and environment variables.
   def execute(command)
-    # TODO: Ensure the underlying connection is re-used and re-used in
-    # a threadsafe manner.
-    @transport.connection.run_command(command)
+    connection.run_command(command)
   end
 
   # Determine if an executable exists and return the path
@@ -103,10 +109,6 @@ class RFacter::Node
   #
   # @todo Add support for setting user accounts and environment variables.
   def which(executable)
-    # TODO: Ensure the underlying connection is re-used and re-used in
-    # a threadsafe manner.
-    connection = @transport.connection
-
     # TODO: Abstract away from the Train "os" implementation.
     result = if connection.os.windows?
       connection.run_command("(Get-Command -TotalCount 1 #{executable}).Path")
