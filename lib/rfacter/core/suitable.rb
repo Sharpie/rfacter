@@ -1,9 +1,5 @@
-require 'facter'
-
-require 'facter'
-require 'facter/util/confine'
-
 require 'rfacter'
+require_relative '../util/confine'
 
 # The Suitable mixin provides mechanisms for confining objects to run on
 # certain platforms and determining the run precedence of these objects.
@@ -80,14 +76,14 @@ module RFacter::Core::Suitable
     case confines
     when Hash
       confines.each do |fact, values|
-        @confines.push ::Facter::Util::Confine.new(fact, *values)
+        @confines.push RFacter::Util::Confine.new(fact, *values)
       end
     else
       if block
         if confines
-          @confines.push ::Facter::Util::Confine.new(confines, &block)
+          @confines.push RFacter::Util::Confine.new(confines, &block)
         else
-          @confines.push ::Facter::Util::Confine.new(&block)
+          @confines.push RFacter::Util::Confine.new(&block)
         end
       else
       end
