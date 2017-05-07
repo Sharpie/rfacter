@@ -143,3 +143,47 @@ PS1
     }
   end
 end
+
+Facter.add(:os, :type => :aggregate) do
+  confine :kernel => 'aix'
+
+  chunk(:name) do
+    {'name' => 'AIX'}
+  end
+
+  chunk(:family) do
+    {'family' => 'AIX'}
+  end
+
+  chunk(:architecture) do
+    model_info = Facter::Core::Execution.exec('lsattr -El sys0 -a modelname')
+    model = if (match = model_info.match(/modelname\s(\S+)\s/))
+      match.captures.first
+    else
+      nil
+    end
+
+    arch_info = Facter::Core::Execution.exec('lsattr -El proc0 -a type')
+    arch = if (match = arch_info.match(/type\s(\S+)\s/))
+      match.captures.first
+    else
+      nil
+    end
+
+    architecture = {
+      'architecture' => arch,
+      'hardware' => model
+    }
+
+    architecture.reject{|_, v| v.nil?}
+  end
+
+  chunk(:release) do
+    release_info = {
+      'full'  => Facter.value(:kernelrelease),
+      'major' => Facter.value(:kernelrelease).split('-')[0]
+    }
+
+    {'release' => release_info}
+  end
+end
