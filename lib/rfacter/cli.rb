@@ -23,15 +23,14 @@ module RFacter::CLI
     logger.info('cli::run') { "Configured nodes: #{@config.nodes.values.map(&:hostname)}" }
 
     collection = RFacter::Util::Collection.new
+    collection.load_all
 
     facts = @config.nodes.values.inject(Hash.new) do |h, node|
-      node_facts = Hash.new
-      node_facts['hostname'] = collection.value('hostname', node)
+      h[node.hostname] = collection.to_hash(node)
 
       # TODO: Implement per-node fact values.
       collection.flush
 
-      h[node.hostname] = node_facts
       h
     end
 

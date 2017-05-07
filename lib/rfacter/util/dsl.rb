@@ -80,6 +80,13 @@ EOS
       ::RFacter::Config.config.logger.log_exception(exception, messge)
     end
 
+    # Gets a hash mapping fact names to their values.
+    #
+    # @return [Hash{String => Object}] the hash of fact names and values
+    def self.to_hash
+      COLLECTION.value.to_hash(NODE.value)
+    end
+
     # Gets the value for a fact.
     #
     # @param name [String, Symbol] the fact name

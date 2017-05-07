@@ -112,13 +112,17 @@ class RFacter::Util::Collection
   end
 
   # Return a hash of all of our facts.
-  def to_hash
+  def to_hash(node)
     @facts.inject({}) do |h, ary|
-      value = ary[1].value
-      if ! value.nil?
-        # For backwards compatibility, convert the fact name to a string.
-        h[ary[0].to_s] = value
+      resolved_value = RFacter::Util::DSL::COLLECTION.bind(self) do
+        RFacter::Util::DSL::NODE.bind(node) do
+          ary[1].value
+        end
       end
+
+      # For backwards compatibility, convert the fact name to a string.
+      h[ary[0].to_s] = resolved_value unless resolved_value.nil?
+
       h
     end
   end
