@@ -1,9 +1,8 @@
 require 'forwardable'
 
-require 'facter' # TODO: Remove once resolutions and aggregates are implemented.
-require 'facter/core/aggregate'
-
 require 'rfacter'
+require_relative '../config'
+require_relative '../core/aggregate'
 require_relative 'resolution'
 
 # This class represents a fact. Each fact has a name and multiple
@@ -200,7 +199,7 @@ class RFacter::Util::Fact
       when :simple
         resolve = RFacter::Util::Resolution.new(resolution_name, self)
       when :aggregate
-        resolve = ::Facter::Core::Aggregate.new(resolution_name, self)
+        resolve = RFacter::Core::Aggregate.new(resolution_name, self)
       else
         raise ArgumentError, "Expected resolution type to be one of (:simple, :aggregate) but was #{resolution_type}"
       end

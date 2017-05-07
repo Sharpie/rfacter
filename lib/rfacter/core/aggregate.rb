@@ -1,8 +1,13 @@
+require 'forwardable'
+
 require 'facter'
 require 'facter/core/directed_graph'
 require 'facter/core/suitable'
 require 'facter/core/resolvable'
 require 'facter/util/values'
+
+require 'rfacter'
+require_relative '../config'
 
 # Aggregates provide a mechanism for facts to be resolved in multiple steps.
 #
@@ -15,10 +20,13 @@ require 'facter/util/values'
 #
 # @api public
 # @since 2.0.0
-class Facter::Core::Aggregate
+class RFacter::Core::Aggregate
+  extend Forwardable
 
-  include Facter::Core::Suitable
-  include Facter::Core::Resolvable
+  instance_delegate([:logger] => :@config)
+
+  include ::Facter::Core::Suitable
+  include ::Facter::Core::Resolvable
 
   # @!attribute [r] name
   #   @return [Symbol] The name of the aggregate resolution
@@ -40,15 +48,16 @@ class Facter::Core::Aggregate
   # @api private
   attr_reader :fact
 
-  def initialize(name, fact)
+  def initialize(name, fact, config: RFacter::Config.config, **options)
     @name = name
     @fact = fact
+    @config = config
 
     @confines = []
     @chunks = {}
 
     @aggregate = nil
-    @deps = Facter::Core::DirectedGraph.new
+    @deps = ::Facter::Core::DirectedGraph.new
   end
 
   def set_options(options)
@@ -170,7 +179,7 @@ class Facter::Core::Aggregate
       input = @deps[name].map { |dep_name| results[dep_name] }
 
       output = block.call(*input)
-      results[name] = Facter::Util::Values.deep_freeze(output)
+      results[name] = ::Facter::Util::Values.deep_freeze(output)
     end
 
     results
@@ -193,9 +202,9 @@ class Facter::Core::Aggregate
 
   def default_aggregate(results)
     results.values.inject do |result, current|
-      Facter::Util::Values.deep_merge(result, current)
+      ::Facter::Util::Values.deep_merge(result, current)
     end
-  rescue Facter::Util::Values::DeepMergeError => e
+  rescue ::Facter::Util::Values::DeepMergeError => e
     raise ArgumentError, "Could not deep merge all chunks (Original error: " +
       "#{e.message}), ensure that chunks return either an Array or Hash or " +
       "override the aggregate block", e.backtrace

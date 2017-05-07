@@ -85,9 +85,10 @@ EOS
     end
 
     # Facter::Core DSL methods
-    #
-    # @todo Implement Facter::Core::Aggregate
     module Core
+      require_relative '../core/aggregate'
+      Aggregate = ::RFacter::Core::Aggregate
+
       # Shims for Facter::Core::Exection methods
       #
       # @todo Implement execution options
