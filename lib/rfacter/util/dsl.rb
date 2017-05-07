@@ -34,11 +34,9 @@ EOS
 
   # Shims for top-level Facter methods
   #
-  # @todo Implement `[]`
   # @todo Implement `clear`
   # @todo Implement `define_fact`
   # @todo Implement `each`
-  # @todo Implement `fact`
   # @todo Implement `flush`
   # @todo Implement `list`
   # @todo Implement `loadfacts`
@@ -46,12 +44,21 @@ EOS
   # @todo Implement `search`
   # @todo Implement `search_path`
   # @todo Implement `to_hash`
-  # @todo Implement `value`
   # @todo Implement `version`
   module Facter
-    # TODO: Implement []
+    # Returns a fact object by name.
     #
-    # Shim for Facter.add(...)
+    # If you use this, you still have to call
+    # {RFacter::Util::Fact#value `value`} on it to retrieve the actual value.
+    #
+    # @param name [String, Symbol] the name of the fact
+    #
+    # @return [RFacter::Util::Fact, nil] The fact object, or nil if no fact
+    #   is found.
+    def self.[](name)
+      COLLECTION.value.fact(name)
+    end
+
     def self.add(name, options = {}, &block)
       COLLECTION.value.add(name, options, &block)
     end
@@ -64,8 +71,23 @@ EOS
       ::RFacter::Config.config.logger.debugonce(msg)
     end
 
+    # (see [])
+    def self.fact(name)
+      COLLECTION.value.fact(name)
+    end
+
     def self.log_exception(exception, message = nil)
       ::RFacter::Config.config.logger.log_exception(exception, messge)
+    end
+
+    # Gets the value for a fact.
+    #
+    # @param name [String, Symbol] the fact name
+    #
+    # @return [Object, nil] the value of the fact, or nil if no fact is
+    #   found
+    def self.value(name)
+      COLLECTION.value.value(name, NODE.value)
     end
 
     def self.warn(msg)
