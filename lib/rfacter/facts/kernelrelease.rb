@@ -4,15 +4,12 @@
 #
 # Resolution:
 #   On AIX, returns the output from the `oslevel -s` system command.
-#   On Windows-based systems, uses the win32ole gem to query Windows Management
+#   On Windows-based systems, uses `Get-WmiObject` to query Windows Management
 #   for the `Win32_OperatingSystem` value.
 #   Otherwise uses the output of `uname -r` system command.
 #
 # Caveats:
 #
-require 'facter/util/posix'
-require 'facter/util/windows'
-
 Facter.add(:kernelrelease) do
   setcode 'uname -r'
 end
@@ -25,7 +22,8 @@ end
 Facter.add("kernelrelease") do
   confine :kernel => :openbsd
   setcode do
-    Facter::Util::POSIX.sysctl("kern.version").split(' ')[1]
+    version = Facter::Core::Execution.execute('sysctl -n kern.version')
+    version.split(' ')[1]
   end
 end
 
@@ -39,7 +37,5 @@ end
 
 Facter.add(:kernelrelease) do
   confine :kernel => "windows"
-  setcode do
-    Facter::Util::Windows::Process.os_version_string
-  end
+  setcode '(Get-WmiObject -Class Win32_OperatingSystem -Property Version).Version'
 end
