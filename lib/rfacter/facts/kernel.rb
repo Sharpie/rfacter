@@ -11,9 +11,13 @@
 
 Facter.add(:kernel) do
   setcode do
-    require 'facter/util/config'
-
-    if Facter::Util::Config.is_windows?
+    # FIXME: This is a bit naive as winrm could conceivably connect to
+    # PowerShell running on POSIX and ssh could connect to a Windows node due
+    # to recent investments by Microsoft in Open Source.
+    #
+    # This also won't work correctly for local execution on a Windows node.
+    case NODE.value.scheme
+    when 'winrm'
       'windows'
     else
       Facter::Core::Execution.exec("uname -s")
