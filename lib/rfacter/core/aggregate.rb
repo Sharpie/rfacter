@@ -2,12 +2,12 @@ require 'forwardable'
 
 require 'facter'
 require 'facter/core/directed_graph'
-require 'facter/core/suitable'
 require 'facter/util/values'
 
 require 'rfacter'
 require_relative '../config'
 require_relative 'resolvable'
+require_relative 'suitable'
 
 # Aggregates provide a mechanism for facts to be resolved in multiple steps.
 #
@@ -25,7 +25,7 @@ class RFacter::Core::Aggregate
 
   instance_delegate([:logger] => :@config)
 
-  include ::Facter::Core::Suitable
+  include RFacter::Core::Suitable
   include RFacter::Core::Resolvable
 
   # @!attribute [r] name

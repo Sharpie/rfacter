@@ -1,10 +1,9 @@
 require 'forwardable'
 
-require 'facter/core/suitable'
-
 require 'rfacter'
 require_relative '../config'
 require_relative '../core/resolvable'
+require_relative '../core/suitable'
 require_relative 'dsl'
 
 # This represents a fact resolution. A resolution is a concrete
@@ -28,7 +27,7 @@ class RFacter::Util::Resolution
   attr_writer :value
 
   include RFacter::Core::Resolvable
-  include ::Facter::Core::Suitable
+  include RFacter::Core::Suitable
 
   # @!attribute [rw] name
   # The name of this resolution. The resolution name should be unique with

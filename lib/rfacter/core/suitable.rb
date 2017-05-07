@@ -1,11 +1,16 @@
 require 'facter'
 
+require 'facter'
+require 'facter/util/confine'
+
+require 'rfacter'
+
 # The Suitable mixin provides mechanisms for confining objects to run on
 # certain platforms and determining the run precedence of these objects.
 #
 # Classes that include the Suitable mixin should define a `#confines` method
 # that returns an Array of zero or more Facter::Util::Confine objects.
-module Facter::Core::Suitable
+module RFacter::Core::Suitable
 
   attr_writer :weight
 
@@ -75,14 +80,14 @@ module Facter::Core::Suitable
     case confines
     when Hash
       confines.each do |fact, values|
-        @confines.push Facter::Util::Confine.new(fact, *values)
+        @confines.push ::Facter::Util::Confine.new(fact, *values)
       end
     else
       if block
         if confines
-          @confines.push Facter::Util::Confine.new(confines, &block)
+          @confines.push ::Facter::Util::Confine.new(confines, &block)
         else
-          @confines.push Facter::Util::Confine.new(&block)
+          @confines.push ::Facter::Util::Confine.new(&block)
         end
       else
       end
