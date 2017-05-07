@@ -1,12 +1,17 @@
 require 'timeout'
 
+require 'facter'
+require 'facter/util/normalization'
+
+require 'rfacter'
+
 # The resolvable mixin defines behavior for evaluating and returning fact
 # resolutions.
 #
 # Classes including this mixin should implement at #name method describing
 # the value being resolved and a #resolve_value that actually executes the code
 # to resolve the value.
-module Facter::Core::Resolvable
+module RFacter::Core::Resolvable
 
   # The timeout, in seconds, for evaluating this resolution.
   # @return [Integer]
@@ -64,15 +69,15 @@ module Facter::Core::Resolvable
       end
     end
 
-    Facter::Util::Normalization.normalize(result)
+    ::Facter::Util::Normalization.normalize(result)
   rescue Timeout::Error => detail
-    Facter.log_exception(detail, "Timed out after #{limit} seconds while resolving #{qualified_name}")
+   logger.log_exception(detail, "Timed out after #{limit} seconds while resolving #{qualified_name}")
     return nil
-  rescue Facter::Util::Normalization::NormalizationError => detail
-    Facter.log_exception(detail, "Fact resolution #{qualified_name} resolved to an invalid value: #{detail.message}")
+  rescue ::Facter::Util::Normalization::NormalizationError => detail
+   logger.log_exception(detail, "Fact resolution #{qualified_name} resolved to an invalid value: #{detail.message}")
     return nil
   rescue => detail
-    Facter.log_exception(detail, "Could not retrieve #{qualified_name}: #{detail.message}")
+   logger.log_exception(detail, "Could not retrieve #{qualified_name}: #{detail.message}")
     return nil
   end
 
@@ -85,7 +90,7 @@ module Facter::Core::Resolvable
 
     finishtime = Time.now.to_f
     ms = (finishtime - starttime) * 1000
-    Facter.show_time "#{qualified_name}: #{"%.2f" % ms}ms"
+    ::Facter.show_time "#{qualified_name}: #{"%.2f" % ms}ms"
   end
 
   def qualified_name
