@@ -106,15 +106,14 @@ class RFacter::Util::Loader
       # Store the file path so we don't try to reload it
       @loaded << file
 
-      RFacter::Util::DSL::COLLECTION.value = collection
-      collection.instance_eval(File.read(file))
+      RFacter::Util::DSL::COLLECTION.bind(collection) do
+        collection.instance_eval(File.read(file))
+      end
     rescue => detail
       # Don't store the path if the file can't be loaded
       # in case it's loadable later on.
       @loaded.delete(file)
       logger.log_exception(detail, "Error loading fact #{file}: #{detail.message}")
-    ensure
-      RFacter::Util::DSL::COLLECTION.value = nil
     end
   end
 end

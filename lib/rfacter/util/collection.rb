@@ -124,12 +124,13 @@ class RFacter::Util::Collection
   end
 
   def value(name, node)
-    RFacter::Util::DSL::NODE.value = node
-    if fact = fact(name)
-      fact.value
+    RFacter::Util::DSL::COLLECTION.bind(self) do
+      RFacter::Util::DSL::NODE.bind(node) do
+        if fact = fact(name)
+          fact.value
+        end
+      end
     end
-  ensure
-    RFacter::Util::DSL::NODE.value = nil
   end
 
   private
