@@ -187,3 +187,77 @@ Facter.add(:os, :type => :aggregate) do
     {'release' => release_info}
   end
 end
+
+Facter.add(:os, :type => :aggregate) do
+  confine :kernel => 'sunos'
+
+  chunk(:name) do
+    output = Facter::Core::Execution.exec('uname -v')
+
+    name = if output =~ /^joyent_/
+      "SmartOS"
+    elsif output =~ /^oi_/
+      "OpenIndiana"
+    elsif output =~ /^omnios-/
+      "OmniOS"
+    elsif Facter::Util::FileRead.exists?("/etc/debian_version")
+      "Nexenta"
+    else
+      "Solaris"
+    end
+
+    {'name' => name}
+  end
+
+  chunk(:family) do
+    {'family' => 'Solaris'}
+  end
+
+  chunk(:architecture) do
+    arch = Facter::Core::Execution.execute('uname -m')
+
+    {
+      'architecture' => arch,
+      'hardware' => arch
+    }
+  end
+
+  chunk(:release, require: [:name]) do |osname|
+    full = if (release = Facter::Util::FileFread.read('/etc/release'))
+      line = release.split("\n").first
+
+      # Solaris 10: Solaris 10 10/09 s10x_u8wos_08a X86
+      # Solaris 11 (old naming scheme): Oracle Solaris 11 11/11 X86
+      # Solaris 11 (new naming scheme): Oracle Solaris 11.1 SPARC
+      if match = /\s+s(\d+)[sx]?(_u\d+)?.*(?:SPARC|X86)/.match(line)
+        match.captures.join('')
+      elsif match = /Solaris ([0-9\.]+(?:\s*[0-9\.\/]+))\s*(?:SPARC|X86)/.match(line)
+        match.captures[0]
+      else
+        Facter.value(:kernelrelease)
+      end
+    else
+      Facter(:kernelrelease).value
+    end
+
+    major = if osname['name'] == "Solaris"
+      if match = full.match(/^(\d+)/)
+        match.captures[0]
+      end
+    end
+
+    minor = if osname['name'] == "Solaris"
+      if match = full.match(/^\d+(?:\.|_u)(\d+)/)
+        match.captures[0]
+      end
+    end
+
+    release_info = {
+      'full'  => full,
+      'major' => major,
+      'minor' => minor
+    }
+
+    {'release' => release_info.reject{|_, v| v.nil?}}
+  end
+end

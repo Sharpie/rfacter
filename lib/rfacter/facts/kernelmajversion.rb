@@ -16,7 +16,7 @@ Facter.add("kernelmajversion") do
 end
 
 Facter.add("kernelmajversion") do
-  confine :kernel => :FreeBSD
+  confine :kernel => [:FreeBSD, :SunOS]
   setcode do
     Facter.value(:kernelversion).split('.')[0]
   end
