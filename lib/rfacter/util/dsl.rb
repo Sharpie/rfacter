@@ -182,6 +182,21 @@ EOS
 
       require_relative 'resolution'
       Resolution = ::RFacter::Util::Resolution
+
+      # Methods for interacting with remote files.
+      #
+      # @note The `exists?` part is uniqe to RFacter.
+      #
+      # @todo Possibly augment this with some top-level shims for File?
+      module FileRead
+        def self.read(path)
+          NODE.value.file(path).content
+        end
+
+        def self.exists?(path)
+          NODE.value.file(path).exist?
+        end
+      end
     end
   end
 end

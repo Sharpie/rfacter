@@ -122,4 +122,16 @@ class RFacter::Node
       result.stdout.chomp
     end
   end
+
+  # Interact with remote files in a read-only manner
+  #
+  # This method returns an object that can povide read only access to the stats
+  # and content of a particular file path.
+  #
+  # @param path [String] The file path to interact with.
+  #
+  # @return [Train::Extras::FileCommon] An object representing the remote file.
+  def file(path)
+    connection.file(path)
+  end
 end
