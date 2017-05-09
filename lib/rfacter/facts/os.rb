@@ -28,6 +28,334 @@ Facter.add(:os, :type => :aggregate) do
 end
 
 Facter.add(:os, :type => :aggregate) do
+  confine :kernel => 'linux'
+
+  chunk(:name) do
+    # TODO: Much of this code was imported from facter/operatingsystem/linux.rb
+    # from Facter 2.4.6. Facter 3 uses the same sort of logic, but tests files
+    # in a different order. Should cross check this to make sure there haven't
+    # been important changes to order or additions.
+
+    # NOTE: Can assume that the transport layer caches the results of File
+    # stats and reads, so multiple file ops only incur a cost once. However,
+    # these ops are all going over the network, so we should probably
+    # prioritize RedHat and SuSE detection over less common Linuxen in order to
+    # cut down on network chatter that will be useless in most cases. Also,
+    # might be worth adding /etc/os-release detection at the front of the list
+    # since that's the new hotness from systemd standardization.
+    operatingsystem = nil
+
+    operatingsystem = if Facter.value(:kernel) == "GNU/kFreeBSD"
+      "GNU/kFreeBSD"
+    elsif Facter::Util::FileRead.exists?('/etc/debian_version')
+      case Facter::Core::Execution.exec('lsb_release -i')
+      when /Ubuntu/i
+        'Ubuntu'
+      when /LinuxMint/i
+        'LinuxMint'
+      else
+        'Debian'
+      end
+    end
+
+    release_files = {
+      "AristaEOS"   => "/etc/Eos-release",
+      "Debian"      => "/etc/debian_version",
+      "Gentoo"      => "/etc/gentoo-release",
+      "Fedora"      => "/etc/fedora-release",
+      "Mageia"      => "/etc/mageia-release",
+      "Mandriva"    => "/etc/mandriva-release",
+      "Mandrake"    => "/etc/mandrake-release",
+      "MeeGo"       => "/etc/meego-release",
+      "Archlinux"   => "/etc/arch-release",
+      "Manjarolinux"=> "/etc/manjaro-release",
+      "OracleLinux" => "/etc/oracle-release",
+      "OpenWrt"     => "/etc/openwrt_release",
+      "Alpine"      => "/etc/alpine-release",
+      "VMWareESX"   => "/etc/vmware-release",
+      "Bluewhite64" => "/etc/bluewhite64-version",
+      "Slamd64"     => "/etc/slamd64-version",
+      "Slackware"   => "/etc/slackware-version"
+    }
+
+    if operatingsystem.nil?
+      release_files.each do |os, releasefile|
+        if Facter::Util::FileRead.exists?(releasefile)
+          operatingsystem = os
+          break # Stop sending commands over the network.
+        end
+      end
+    end
+
+    if operatingsystem.nil?
+      if Facter::Util::FileRead.exists?('/etc/enterprise-release')
+        if Facter::Util::FileRead.exists?('/etc/ovs-release')
+          operatingsystem = "OVS"
+        else
+          operatingsystem = "OEL"
+        end
+      elsif Facter::Util::FileRead.exists?('/etc/redhat-release')
+        operatingsystem = case Facter::Util::FileRead.read('/etc/redhat-release')
+        when /CERN/i
+          'SLC'
+        when /centos/i
+          'CentOS'
+        when /Scientific/i
+          'Scientific'
+        when /^cloudlinux/i
+          'CloudLinux'
+        when /^Parallels Server Bare Metal/
+          'PSBM'
+        when /Ascendos/i
+          'Ascendos'
+        when /^XenServer/i
+          'XenServer'
+        when /XCP/i
+          'XCP'
+        when /^VirtuozzoLinux/i
+          'VirtuozzoLinux'
+        else
+          'RedHat'
+        end
+      elsif Facter::Util::FileRead.exists?('/etc/SuSE-release')
+        operatingsystem = case Facter::Util::FileRead.read('/etc/SuSE-release')
+        when /^SUSE LINUX Enterprise Server/i
+          'SLES'
+        when /^SUSE LINUX Enterprise Desktop/i
+          'SLED'
+        when /^openSUSE/
+          'OpenSuSE'
+        else
+          'SuSE'
+        end
+      elsif Facter::Util::FileRead.exists?('/etc/system-release')
+        operatingsystem = 'Amazon'
+      end
+    end
+
+    operatingsystem = 'unknown' if operatingsystem.nil?
+
+    {'name' => operatingsystem}
+  end
+
+  chunk(:family, require: [:name]) do |os_name|
+    family = case os_name['name']
+    when "RedHat", "Fedora", "CentOS", "Scientific", "SLC", "Ascendos",
+         "CloudLinux", "PSBM", "OracleLinux", "OVS", "OEL", "Amazon",
+         "XenServer", "VirtuozzoLinux"
+      "RedHat"
+    when "LinuxMint", "Ubuntu", "Debian"
+      "Debian"
+    when "SLES", "SLED", "OpenSuSE", "SuSE"
+      "Suse"
+    when "Gentoo"
+      "Gentoo"
+    when "Archlinux", "Manjarolinux"
+      "Archlinux"
+    when "Mageia", "Mandriva", "Mandrake"
+      "Mandrake"
+    else
+      Facter.value("kernel")
+    end
+
+    {'family' => family}
+  end
+
+  chunk(:architecture, require: [:name]) do |os_name|
+    model = Facter::Core::Execution.execute('uname -m')
+
+    arch = case model
+    when "x86_64"
+      case os_name['name']
+      when "Debian", "Gentoo", "GNU/kFreeBSD", "Ubuntu"
+        "amd64"
+      else
+        model
+      end
+    when /(i[3456]86|pentium)/
+      case os_name['name']
+      when "Gentoo"
+        "x86"
+      else
+        "i386"
+      end
+    else
+      model
+    end
+
+    {
+      'architecture' => arch,
+      'hardware' => model
+    }
+  end
+
+  chunk(:release, require: [:name]) do |os_name|
+    full = nil
+    major = nil
+    minor = nil
+
+    case os_name['name']
+    when "Alpine"
+      if release = Facter::Util::FileRead.read('/etc/alpine-release')
+        full = release.sub(/\s*$/, '')
+      end
+    when "Amazon"
+      if (lsb_release = Facter::Core::Execution.exec('lsb_release -r')) && (! lsb_release.empty?)
+        full = release.split(':').last.strip
+      else
+        if release = Facter::Util::FileRead.read('/etc/system-release')
+          if match = /\d+\.\d+/.match(release)
+            full = match[0]
+          end
+        end
+      end
+    when "AristaEOS"
+      if release = Facter::Util::FileRead.read('/etc/Eos-release')
+        if match = /\d+\.\d+(:?\.\d+)?[A-M]?$/.match(release)
+          full = match[0]
+        end
+      end
+    when "BlueWhite64"
+      full = if release = Facter::Util::Read.read('/etc/bluewhite64-version')
+        if match = /^\s*\w+\s+(\d+)\.(\d+)/.match(release)
+          match[1] + "." + match[2]
+        else
+          "unknown"
+        end
+      end
+    when "CentOS", "RedHat", "Scientific", "SLC", "Ascendos", "CloudLinux", "PSBM",
+         "XenServer", "Fedora", "MeeGo", "OracleLinux", "OEL", "oel", "OVS", "ovs",
+         "VirtuozzoLinux"
+      case os_name['name']
+      when "CentOS", "RedHat", "Scientific", "SLC", "Ascendos", "CloudLinux",
+           "PSBM", "XenServer", "VirtuozzoLinux"
+        releasefile = "/etc/redhat-release"
+      when "Fedora"
+        releasefile = "/etc/fedora-release"
+      when "MeeGo"
+        releasefile = "/etc/meego-release"
+      when "OracleLinux"
+        releasefile = "/etc/oracle-release"
+      when "OEL", "oel"
+        releasefile = "/etc/enterprise-release"
+      when "OVS", "ovs"
+        releasefile = "/etc/ovs-release"
+      end
+
+      full = if (release = Facter::Util::FileRead.read(releasefile))
+        line = release.split("\n").first.chomp
+        if match = /\(Rawhide\)$/.match(line)
+          "Rawhide"
+        elsif match = /release (\d[\d.]*)/.match(line)
+          match[1]
+        end
+      end
+    when "Debian"
+      full = if (release = Facter::Util::FileRead.read('/etc/debian_version'))
+        release.sub!(/\s*$/, '')
+        release
+      end
+    when "LinuxMint"
+      full = if (release = Facter::Util::FileRead.read('/etc/linuxmint/info'))
+        if match = release.match(/RELEASE=(\d+)/)
+          match[1]
+        end
+      end
+    when "Mageia"
+      full = if (release = Facter::Util::FileRead.read('/etc/mageia-release'))
+        if match = release.match(/Mageia release ([0-9.]+)/)
+          match[1]
+        end
+      end
+    when "OpenWrt"
+      full = if (release = Facter::Util::FileRead.read('/etc/openwrt_version'))
+        if match = release.match(/^(\d+\.\d+.*)/)
+          match[1]
+        end
+      end
+    when "Slackware"
+      full = if (release = Facter::Util::FileRead.read('/etc/slackware-version'))
+        if match = release.match(/Slackware ([0-9.]+)/)
+          match[1]
+        end
+      end
+    when "Slamd64"
+      full = if (release = Facter::Util::FileRead.read('/etc/slamd64-version'))
+        if match = release.match(/^\s*\w+\s+(\d+)\.(\d+)/)
+          match[1]
+        end
+      end
+   when "SLES", "SLED", "OpenSuSE"
+      full = if (release = Facter::Util::FileRead.read('/etc/SuSE-release'))
+        if match = /^VERSION\s*=\s*(\d+)/.match(release)
+          releasemajor = match[1]
+          if match = /^PATCHLEVEL\s*=\s*(\d+)/.match(release)
+            releaseminor = match[1]
+          elsif match = /^VERSION\s=.*.(\d+)/.match(release)
+            releaseminor = match[1]
+          else
+            releaseminor = "0"
+          end
+          releasemajor + "." + releaseminor
+        else
+          "unknown"
+        end
+      end
+    when "Ubuntu"
+      full = if (release = Facter::Util::FileRead.read('/etc/lsb-release'))
+        if match = release.match(/DISTRIB_RELEASE=((\d+.\d+)(\.(\d+))?)/)
+          # Return only the major and minor version numbers.  This behavior must
+          # be preserved for compatibility reasons.
+          match[2]
+        end
+      end
+    when "VMwareESX"
+      release = Facter::Core::Execution.exec('vmware -v')
+      full = if (match = /VMware ESX .*?(\d.*)/.match(release))
+        match[1]
+      end
+    else
+      Facter.value(:kernelrelease)
+    end
+
+    case os_name['name']
+    when 'Ubuntu'
+      major = if (releasemajor = full.split("."))
+        if releasemajor.length >= 2
+          "#{releasemajor[0]}.#{releasemajor[1]}"
+        else
+          releasemajor[0]
+        end
+      end
+
+      minor = if (releaseminor = full.split(".")[2])
+        releaseminor
+      end
+    else
+      major = if (releasemajor = full.split(".")[0])
+        releasemajor
+      end
+
+      minor = if (releaseminor = full.split(".")[1])
+        if releaseminor.include? "-"
+          releaseminor.split("-")[0]
+        else
+          releaseminor
+        end
+      end
+    end
+
+    release_info = {
+      'full'  => full,
+      'major' => major,
+      'minor' => minor
+    }
+
+    {'release' => release_info.reject{|_, v| v.nil?}}
+  end
+end
+
+Facter.add(:os, :type => :aggregate) do
   confine :kernel => 'windows'
 
   chunk(:name) do
