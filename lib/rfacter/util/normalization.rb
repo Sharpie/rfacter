@@ -1,4 +1,6 @@
-module Facter
+require 'rfacter'
+
+module RFacter
   module Util
     module Normalization
       class NormalizationError < StandardError; end

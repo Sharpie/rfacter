@@ -1,9 +1,7 @@
 require 'timeout'
 
-require 'facter'
-require 'facter/util/normalization'
-
 require 'rfacter'
+require_relative '../util/normalization'
 
 # The resolvable mixin defines behavior for evaluating and returning fact
 # resolutions.
@@ -69,11 +67,11 @@ module RFacter::Core::Resolvable
       end
     end
 
-    ::Facter::Util::Normalization.normalize(result)
+    RFacter::Util::Normalization.normalize(result)
   rescue Timeout::Error => detail
    logger.log_exception(detail, "Timed out after #{limit} seconds while resolving #{qualified_name}")
     return nil
-  rescue ::Facter::Util::Normalization::NormalizationError => detail
+  rescue RFacter::Util::Normalization::NormalizationError => detail
    logger.log_exception(detail, "Fact resolution #{qualified_name} resolved to an invalid value: #{detail.message}")
     return nil
   rescue => detail
@@ -90,7 +88,7 @@ module RFacter::Core::Resolvable
 
     finishtime = Time.now.to_f
     ms = (finishtime - starttime) * 1000
-    ::Facter.show_time "#{qualified_name}: #{"%.2f" % ms}ms"
+    #::Facter.show_time "#{qualified_name}: #{"%.2f" % ms}ms"
   end
 
   def qualified_name
