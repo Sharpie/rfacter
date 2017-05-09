@@ -1,7 +1,8 @@
 require 'forwardable'
 
 require 'rfacter'
-require_relative 'dsl'
+require_relative '../config'
+require_relative '../dsl'
 require_relative 'loader'
 require_relative 'fact'
 
@@ -12,7 +13,7 @@ require_relative 'fact'
 class RFacter::Util::Collection
   # Ensures unqualified namespaces like `Facter` and `Facter::Util` get
   # re-directed to RFacter shims when the loader calls `instance_eval`
-  include RFacter::Util::DSL
+  include RFacter::DSL
   extend Forwardable
 
   instance_delegate([:logger] => :@config)
@@ -114,8 +115,8 @@ class RFacter::Util::Collection
   # Return a hash of all of our facts.
   def to_hash(node)
     @facts.inject({}) do |h, ary|
-      resolved_value = RFacter::Util::DSL::COLLECTION.bind(self) do
-        RFacter::Util::DSL::NODE.bind(node) do
+      resolved_value = RFacter::DSL::COLLECTION.bind(self) do
+        RFacter::DSL::NODE.bind(node) do
           ary[1].value
         end
       end
@@ -128,8 +129,8 @@ class RFacter::Util::Collection
   end
 
   def value(name, node)
-    RFacter::Util::DSL::COLLECTION.bind(self) do
-      RFacter::Util::DSL::NODE.bind(node) do
+    RFacter::DSL::COLLECTION.bind(self) do
+      RFacter::DSL::NODE.bind(node) do
         if fact = fact(name)
           fact.value
         end

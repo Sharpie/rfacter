@@ -1,8 +1,8 @@
 require 'concurrent'
 
 require 'rfacter'
-require_relative '../config'
-require_relative 'non_nullable'
+require_relative 'config'
+require_relative 'util/non_nullable'
 
 # Facter compatibility layer
 #
@@ -18,7 +18,7 @@ require_relative 'non_nullable'
 #
 # @api public
 # @since 0.1.0
-module RFacter::Util::DSL
+module RFacter::DSL
   # FIXME: Add i18n for the following.
   COLLECTION = RFacter::Util::NonNullable.new(err_message: <<-EOS)
 A Facter DSL method that manipulates a fact collection was called without the
@@ -107,7 +107,7 @@ EOS
 
     # Facter::Core DSL methods
     module Core
-      require_relative '../core/aggregate'
+      require_relative 'core/aggregate'
       Aggregate = ::RFacter::Core::Aggregate
 
       # Shims for Facter::Core::Exection methods
@@ -150,7 +150,7 @@ EOS
             output = NODE.value.execute(command).stdout.chomp
           rescue => detail
             if on_fail == :raise
-              raise ::RFacter::Util::DSL::Facter::Core::Execution::ExecutionFailure.new,
+              raise ::RFacter::DSL::Facter::Core::Execution::ExecutionFailure.new,
                 "Failed while executing '#{command}': #{detail.message}"
             else
               return on_fail
@@ -177,10 +177,10 @@ EOS
 
     # Facter::Util DSL methods
     module Util
-      require_relative 'fact'
+      require_relative 'util/fact'
       Fact = ::RFacter::Util::Fact
 
-      require_relative 'resolution'
+      require_relative 'util/resolution'
       Resolution = ::RFacter::Util::Resolution
 
       # Methods for interacting with remote files.

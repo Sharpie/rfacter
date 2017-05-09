@@ -2,9 +2,9 @@ require 'forwardable'
 
 require 'rfacter'
 require_relative '../config'
+require_relative '../dsl'
 require_relative '../core/resolvable'
 require_relative '../core/suitable'
-require_relative 'dsl'
 
 # This represents a fact resolution. A resolution is a concrete
 # implementation of a fact. A single fact can have many resolutions and
@@ -42,11 +42,11 @@ class RFacter::Util::Resolution
   attr_reader :fact
 
   def which(command)
-    ::RFacter::Util::DSL::Facter::Core::Execution.which(command)
+    ::RFacter::DSL::Facter::Core::Execution.which(command)
   end
 
   def exec(command)
-    ::RFacter::Util::DSL::Facter::Core::Execution.exec(command)
+    ::RFacter::DSL::Facter::Core::Execution.exec(command)
   end
 
   # Create a new resolution mechanism.

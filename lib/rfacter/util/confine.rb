@@ -2,8 +2,8 @@ require 'forwardable'
 
 require 'rfacter'
 require_relative '../config'
+require_relative '../dsl'
 require_relative 'values'
-require_relative 'dsl'
 
 # A restricting tag for fact resolution mechanisms.  The tag must be true
 # for the resolution mechanism to be suitable.
@@ -53,7 +53,7 @@ class RFacter::Util::Confine
       end
     end
 
-    unless fact = RFacter::Util::DSL::Facter[@fact]
+    unless fact = RFacter::DSL::Facter[@fact]
       logger.debug "No fact for %s" % @fact
       return false
     end

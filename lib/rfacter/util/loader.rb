@@ -2,8 +2,8 @@ require 'pathname'
 require 'forwardable'
 
 require 'rfacter'
-require_relative 'dsl'
 require_relative '../config'
+require_relative '../dsl'
 
 # Load facts on demand.
 #
@@ -106,7 +106,7 @@ class RFacter::Util::Loader
       # Store the file path so we don't try to reload it
       @loaded << file
 
-      RFacter::Util::DSL::COLLECTION.bind(collection) do
+      RFacter::DSL::COLLECTION.bind(collection) do
         collection.instance_eval(File.read(file))
       end
     rescue => detail
