@@ -13,7 +13,7 @@ module RFacter::CLI
   delegate([:logger] => :@config)
 
   def self.run(argv)
-    args = RFacter::Config.configure_from_argv!(argv)
+    names = RFacter::Config.configure_from_argv!(argv)
     @config = RFacter::Config.config
 
     if @config.nodes.empty?
@@ -26,11 +26,20 @@ module RFacter::CLI
     collection.load_all
 
     facts = @config.nodes.values.inject(Hash.new) do |h, node|
-      h[node.hostname] = collection.to_hash(node)
+      node_facts = if names.empty?
+        collection.to_hash(node)
+      else
+        names.inject(Hash.new) do |n, name|
+          n[name] = collection.value(name, node)
+          n
+        end
+      end
 
-      # TODO: Implement per-node fact values.
+      # TODO: Implement proper per-node Fact caching so that we don't just
+      # reset the colleciton on each loop.
       collection.flush
 
+      h[node.hostname] = node_facts
       h
     end
 
