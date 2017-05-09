@@ -1,10 +1,8 @@
 require 'forwardable'
 
-require 'facter'
-require 'facter/util/values'
-
 require 'rfacter'
 require_relative '../config'
+require_relative 'values'
 require_relative 'dsl'
 
 # A restricting tag for fact resolution mechanisms.  The tag must be true
@@ -16,7 +14,7 @@ class RFacter::Util::Confine
 
   attr_accessor :fact, :values
 
-  include ::Facter::Util::Values
+  include RFacter::Util::Values
 
   # Add the restriction.  Requires the fact name, an operator, and the value
   # we're comparing to.

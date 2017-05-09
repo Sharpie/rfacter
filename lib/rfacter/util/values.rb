@@ -1,5 +1,6 @@
+require 'rfacter'
 
-module Facter
+module RFacter
   module Util
     # A util module for facter containing helper methods
     module Values

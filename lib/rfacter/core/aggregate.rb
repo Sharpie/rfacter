@@ -2,12 +2,12 @@ require 'forwardable'
 
 require 'facter'
 require 'facter/core/directed_graph'
-require 'facter/util/values'
 
 require 'rfacter'
 require_relative '../config'
 require_relative 'resolvable'
 require_relative 'suitable'
+require_relative '../util/values'
 
 # Aggregates provide a mechanism for facts to be resolved in multiple steps.
 #
@@ -179,7 +179,7 @@ class RFacter::Core::Aggregate
       input = @deps[name].map { |dep_name| results[dep_name] }
 
       output = block.call(*input)
-      results[name] = ::Facter::Util::Values.deep_freeze(output)
+      results[name] = RFacter::Util::Values.deep_freeze(output)
     end
 
     results
@@ -202,9 +202,9 @@ class RFacter::Core::Aggregate
 
   def default_aggregate(results)
     results.values.inject do |result, current|
-      ::Facter::Util::Values.deep_merge(result, current)
+      RFacter::Util::Values.deep_merge(result, current)
     end
-  rescue ::Facter::Util::Values::DeepMergeError => e
+  rescue RFacter::Util::Values::DeepMergeError => e
     raise ArgumentError, "Could not deep merge all chunks (Original error: " +
       "#{e.message}), ensure that chunks return either an Array or Hash or " +
       "override the aggregate block", e.backtrace
