@@ -1,10 +1,8 @@
 require 'forwardable'
 
-require 'facter'
-require 'facter/core/directed_graph'
-
 require 'rfacter'
 require_relative '../config'
+require_relative 'directed_graph'
 require_relative 'resolvable'
 require_relative 'suitable'
 require_relative '../util/values'
@@ -57,7 +55,7 @@ class RFacter::Core::Aggregate
     @chunks = {}
 
     @aggregate = nil
-    @deps = ::Facter::Core::DirectedGraph.new
+    @deps = RFacter::Core::DirectedGraph.new
   end
 
   def set_options(options)

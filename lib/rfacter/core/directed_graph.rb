@@ -1,7 +1,9 @@
 require 'set'
 require 'tsort'
 
-module Facter
+require 'rfacter'
+
+module RFacter
   module Core
     class DirectedGraph < Hash
       include TSort
