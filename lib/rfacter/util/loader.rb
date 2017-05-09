@@ -21,7 +21,7 @@ class RFacter::Util::Loader
   # Load all resolutions for a single fact.
   #
   # @api public
-  # @param name [Symbol]
+  # @param fact [Symbol]
   def load(fact, collection)
     # Now load from the search path
     shortname = fact.to_s.downcase
@@ -97,7 +97,7 @@ class RFacter::Util::Loader
   # Load a file and record is paths to prevent duplicate loads.
   #
   # @api private
-  # @params file [String] The *absolute path* to the file to load
+  # @param file [String] The *absolute path* to the file to load
   def load_file(file, collection)
     return if @loaded.include? file
 

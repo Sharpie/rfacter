@@ -245,7 +245,7 @@ EOS
 
         # Try to execute a command and return the output.
         #
-        # @param code [String] the program to run
+        # @param command [String] the program to run
         #
         # @return [String] the output of the program, or nil if the command
         #   does not exist or could not be executed.
@@ -257,7 +257,7 @@ EOS
 
         # Execute a command and return the output of that program.
         #
-        # @param code [String] the program to run
+        # @param command [String] the program to run
         # @param options [Hash]
         #
         # @option options [Object] :on_fail How to behave when the command

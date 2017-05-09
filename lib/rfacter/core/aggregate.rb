@@ -97,8 +97,8 @@ class RFacter::Core::Aggregate
   #
   # @param name [Symbol] A name unique to this aggregate describing the chunk
   # @param opts [Hash]
-  # @options opts [Array<Symbol>, Symbol] :require One or more chunks
-  #   to evaluate and pass to this block.
+  # @option opts [Array<Symbol>, Symbol] require One or more chunks to evaluate
+  #   and pass to this block.
   # @yield [*Object] Zero or more chunk results
   #
   # @return [void]
