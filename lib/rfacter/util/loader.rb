@@ -83,11 +83,8 @@ class RFacter::Util::Loader
     search_paths.uniq
   end
 
-  private
-
   # Validate that the given path is valid, ie it is an absolute path.
   #
-  # @api private
   # @param path [String]
   # @return [Boolean]
   def valid_search_path?(path)
@@ -96,7 +93,6 @@ class RFacter::Util::Loader
 
   # Load a file and record is paths to prevent duplicate loads.
   #
-  # @api private
   # @param file [String] The *absolute path* to the file to load
   def load_file(file, collection)
     return if @loaded.include? file
@@ -107,9 +103,9 @@ class RFacter::Util::Loader
       @loaded << file
 
       RFacter::DSL::COLLECTION.bind(collection) do
-        collection.instance_eval(File.read(file))
+        collection.instance_eval(File.read(file), file)
       end
-    rescue => detail
+    rescue Exception => detail
       # Don't store the path if the file can't be loaded
       # in case it's loadable later on.
       @loaded.delete(file)
