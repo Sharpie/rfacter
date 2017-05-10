@@ -1,14 +1,14 @@
 require 'spec_helper'
-require 'facter/core/suitable'
+require 'rfacter/core/suitable'
 
-describe Facter::Core::Suitable do
+describe RFacter::Core::Suitable do
 
   class SuitableClass
     def initialize
       @confines = []
     end
     attr_reader :confines
-    include Facter::Core::Suitable
+    include RFacter::Core::Suitable
   end
 
   subject { SuitableClass.new }
@@ -18,10 +18,10 @@ describe Facter::Core::Suitable do
       subject.confine :kernel => 'Linux'
     end
 
-    it "creates a Facter::Util::Confine object for the confine call" do
+    it "creates a RFacter::Util::Confine object for the confine call" do
       subject.confine :kernel => 'Linux'
       conf = subject.confines.first
-      expect(conf).to be_a_kind_of Facter::Util::Confine
+      expect(conf).to be_a_kind_of RFacter::Util::Confine
       expect(conf.fact).to eq :kernel
       expect(conf.values).to eq ['Linux']
     end
@@ -34,7 +34,7 @@ describe Facter::Core::Suitable do
 
     it "creates a Util::Confine instance for the provided fact with block parameter" do
       block = lambda { true }
-      Facter::Util::Confine.expects(:new).with("one")
+      expect(RFacter::Util::Confine).to receive(:new).with("one")
 
       subject.confine("one", &block)
     end
@@ -45,7 +45,7 @@ describe Facter::Core::Suitable do
 
     it "should create a Util::Confine instance for the provided block parameter" do
       block = lambda { true }
-      Facter::Util::Confine.expects(:new)
+      expect(RFacter::Util::Confine).to receive(:new)
 
       subject.confine(&block)
     end
@@ -78,7 +78,9 @@ describe Facter::Core::Suitable do
       subject.confine :kernel => 'Linux'
       subject.confine :operatingsystem => 'Redhat'
 
-      subject.confines.each { |confine| confine.stubs(:true?).returns true }
+      subject.confines.each do |confine|
+        allow(confine).to receive(:true?).and_return(true)
+      end
 
       expect(subject).to be_suitable
     end
@@ -87,8 +89,8 @@ describe Facter::Core::Suitable do
       subject.confine :kernel => 'Linux'
       subject.confine :operatingsystem => 'Redhat'
 
-      subject.confines.first.stubs(:true?).returns true
-      subject.confines.first.stubs(:true?).returns false
+      allow(subject.confines.first).to receive(:true?).and_return(true)
+      allow(subject.confines.first).to receive(:true?).and_return(false)
 
       expect(subject).to_not be_suitable
     end
@@ -96,10 +98,11 @@ describe Facter::Core::Suitable do
     it "recalculates suitability on every invocation" do
       subject.confine :kernel => 'Linux'
 
-      subject.confines.first.stubs(:true?).returns false
+      allow(subject.confines.first).to receive(:true?).and_return(false)
       expect(subject).to_not be_suitable
-      subject.confines.first.unstub(:true?)
-      subject.confines.first.stubs(:true?).returns true
+
+      allow(subject.confines.first).to receive(:true?).and_call_original
+      allow(subject.confines.first).to receive(:true?).and_return(true)
       expect(subject).to be_suitable
     end
   end

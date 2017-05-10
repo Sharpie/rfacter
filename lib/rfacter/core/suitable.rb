@@ -1,5 +1,4 @@
 require 'rfacter'
-require_relative '../util/confine'
 
 # The Suitable mixin provides mechanisms for confining objects to run on
 # certain platforms and determining the run precedence of these objects.
@@ -7,6 +6,7 @@ require_relative '../util/confine'
 # Classes that include the Suitable mixin should define a `#confines` method
 # that returns an Array of zero or more Facter::Util::Confine objects.
 module RFacter::Core::Suitable
+  require_relative '../util/confine'
 
   attr_writer :weight
 
