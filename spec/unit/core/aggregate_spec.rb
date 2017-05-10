@@ -1,18 +1,23 @@
 require 'spec_helper'
-require 'facter/core/aggregate'
+require 'rfacter/core/aggregate'
 
-describe Facter::Core::Aggregate do
+describe RFacter::Core::Aggregate do
 
-  let(:fact) { stub('stub_fact', :name => 'stub_fact') }
+  let(:fact) { double('stub_fact', :name => 'stub_fact') }
+
+  let(:config) { instance_double('RFacter::Config::Settings') }
+  let(:logger) { instance_double('RFacter::Util::Logger') }
+  before(:each) { allow(config).to receive(:logger).and_return(logger) }
+  before(:each) { allow(RFacter::Config).to receive(:config).and_return(config) }
 
   subject { obj = described_class.new('aggregated', fact) }
 
   it "can be resolved" do
-    expect(subject).to be_a_kind_of Facter::Core::Resolvable
+    expect(subject).to be_a_kind_of RFacter::Core::Resolvable
   end
 
   it "can be confined and weighted" do
-    expect(subject).to be_a_kind_of Facter::Core::Suitable
+    expect(subject).to be_a_kind_of RFacter::Core::Suitable
   end
 
   describe "setting options" do
@@ -66,9 +71,9 @@ describe Facter::Core::Aggregate do
       subject.chunk(:first, :require => [:second]) { }
       subject.chunk(:second, :require => [:first]) { }
 
-      Facter.expects(:warn) do |msg|
-        expect(msg).to match /dependency cycles: .*[:first, :second]/
-      end
+      expect(logger).to receive(:log_exception).with(
+        RFacter::Core::Aggregate::DependencyError,
+        /dependency cycles: .*[:first, :second]/)
 
       subject.value
     end
@@ -118,7 +123,7 @@ describe Facter::Core::Aggregate do
 
   describe "evaluating" do
     it "evaluates the block in the context of the aggregate" do
-      subject.expects(:has_weight).with(5)
+      expect(subject).to receive(:has_weight).with(5)
       subject.evaluate { has_weight(5) }
     end
   end
