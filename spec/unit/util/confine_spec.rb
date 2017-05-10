@@ -1,148 +1,148 @@
 #! /usr/bin/env ruby
 
 require 'spec_helper'
-require 'facter/util/confine'
-require 'facter/util/values'
+require 'rfacter/util/confine'
+require 'rfacter/util/values'
 
-include Facter::Util::Values
+include RFacter::Util::Values
 
-describe Facter::Util::Confine do
+describe RFacter::Util::Confine do
   it "should require a fact name" do
-    Facter::Util::Confine.new("yay", true).fact.should == "yay"
+    expect(RFacter::Util::Confine.new("yay", true).fact).to eq("yay")
   end
 
   it "should accept a value specified individually" do
-    Facter::Util::Confine.new("yay", "test").values.should == ["test"]
+    expect(RFacter::Util::Confine.new("yay", "test").values).to eq(["test"])
   end
 
   it "should accept multiple values specified at once" do
-    Facter::Util::Confine.new("yay", "test", "other").values.should == ["test", "other"]
+    expect(RFacter::Util::Confine.new("yay", "test", "other").values).to eq(["test", "other"])
   end
 
   it "should fail if no fact name is provided" do
-    lambda { Facter::Util::Confine.new(nil, :test) }.should raise_error(ArgumentError)
+    expect{ RFacter::Util::Confine.new(nil, :test) }.to raise_error(ArgumentError)
   end
 
   it "should fail if no values were provided" do
-    lambda { Facter::Util::Confine.new("yay") }.should raise_error(ArgumentError)
+    expect{ RFacter::Util::Confine.new("yay") }.to raise_error(ArgumentError)
   end
 
   it "should have a method for testing whether it matches" do
-    Facter::Util::Confine.new("yay", :test).should respond_to(:true?)
+    expect(RFacter::Util::Confine.new("yay", :test)).to respond_to(:true?)
   end
 
   describe "when evaluating" do
     def confined(fact_value, *confines)
-      @fact.stubs(:value).returns fact_value
-      Facter::Util::Confine.new("yay", *confines).true?
+      allow(@fact).to receive(:value).and_return(fact_value)
+      RFacter::Util::Confine.new("yay", *confines).true?
     end
 
     before do
-      @fact = mock 'fact'
-      Facter.stubs(:[]).returns @fact
+      @fact = double('fact')
+      allow(RFacter::DSL::Facter).to receive(:[]).and_return(@fact)
     end
 
     it "should return false if the fact does not exist" do
-      Facter.expects(:[]).with("yay").returns nil
+      expect(RFacter::DSL::Facter).to receive(:[]).with("yay").and_return(nil)
 
-      Facter::Util::Confine.new("yay", "test").true?.should be_false
+      expect(RFacter::Util::Confine.new("yay", "test").true?).to be(false)
     end
 
     it "should use the returned fact to get the value" do
-      Facter.expects(:[]).with("yay").returns @fact
+      expect(RFacter::DSL::Facter).to receive(:[]).with("yay").and_return(@fact)
 
-      @fact.expects(:value).returns nil
+      expect(@fact).to receive(:value).and_return(nil)
 
-      Facter::Util::Confine.new("yay", "test").true?
+      RFacter::Util::Confine.new("yay", "test").true?
     end
 
     it "should return false if the fact has no value" do
-      confined(nil, "test").should be_false
+      expect(confined(nil, "test")).to be(false)
     end
 
     it "should return true if any of the provided values matches the fact's value" do
-      confined("two", "two").should be_true
+      expect(confined("two", "two")).to be(true)
     end
 
     it "should return true if any of the provided symbol values matches the fact's value" do
-      confined(:xy, :xy).should be_true
+      expect(confined(:xy, :xy)).to be(true)
     end
 
     it "should return true if any of the provided integer values matches the fact's value" do
-      confined(1, 1).should be_true
+      expect(confined(1, 1)).to be(true)
     end
 
     it "should return true if any of the provided boolan values matches the fact's value" do
-      confined(true, true).should be_true
+      expect(confined(true, true)).to be(true)
     end
 
     it "should return true if any of the provided array values matches the fact's value" do
-      confined([3,4], [3,4]).should be_true
+      expect(confined([3,4], [3,4])).to be(true)
     end
 
     it "should return true if any of the provided symbol values matches the fact's string value" do
-      confined(:one, "one").should be_true
+      expect(confined(:one, "one")).to be(true)
     end
 
     it "should return true if any of the provided string values matches case-insensitive the fact's value" do
-      confined("four", "Four").should be_true
+      expect(confined("four", "Four")).to be(true)
     end
 
     it "should return true if any of the provided symbol values matches case-insensitive the fact's string value" do
-      confined(:four, "Four").should be_true
+      expect(confined(:four, "Four")).to be(true)
     end
 
     it "should return true if any of the provided symbol values matches the fact's string value" do
-      confined("xy", :xy).should be_true
+      expect(confined("xy", :xy)).to be(true)
     end
 
     it "should return true if any of the provided regexp values matches the fact's string value" do
-      confined("abc", /abc/).should be_true
+      expect(confined("abc", /abc/)).to be(true)
     end
 
     it "should return true if any of the provided ranges matches the fact's value" do
-      confined(6, (5..7)).should be_true
+      expect(confined(6, (5..7))).to be(true)
     end
 
     it "should return false if none of the provided values matches the fact's value" do
-      confined("three", "two", "four").should be_false
+      expect(confined("three", "two", "four")).to be(false)
     end
 
     it "should return false if none of the provided integer values matches the fact's value" do
-      confined(2, 1, [3,4], (5..7)).should be_false
+      expect(confined(2, 1, [3,4], (5..7))).to be(false)
     end
 
     it "should return false if none of the provided boolan values matches the fact's value" do
-      confined(false, true).should be_false
+      expect(confined(false, true)).to be(false)
     end
 
     it "should return false if none of the provided array values matches the fact's value" do
-      confined([1,2], [3,4]).should be_false
+      expect(confined([1,2], [3,4])).to be(false)
     end
 
     it "should return false if none of the provided ranges matches the fact's value" do
-      confined(8, (5..7)).should be_false
+      expect(confined(8, (5..7))).to be(false)
     end
 
     it "should accept and evaluate a block argument against the fact" do
-      @fact.expects(:value).returns 'foo'
-      confine = Facter::Util::Confine.new :yay do |f| f === 'foo' end
-      confine.true?.should be_true
+      expect(@fact).to receive(:value).and_return('foo')
+      confine = RFacter::Util::Confine.new :yay do |f| f === 'foo' end
+      expect(confine.true?).to be(true)
     end
 
     it "should return false if the block raises a StandardError when checking a fact" do
-      @fact.stubs(:value).returns 'foo'
-      confine = Facter::Util::Confine.new :yay do |f| raise StandardError end
-      confine.true?.should be_false
+      allow(@fact).to receive(:value).and_return('foo')
+      confine = RFacter::Util::Confine.new :yay do |f| raise StandardError end
+      expect(confine.true?).to be(false)
     end
 
     it "should accept and evaluate only a block argument" do
-      Facter::Util::Confine.new { true }.true?.should be_true
-      Facter::Util::Confine.new { false }.true?.should be_false
+      expect(RFacter::Util::Confine.new { true }.true?).to be(true)
+      expect(RFacter::Util::Confine.new { false }.true?).to be(false)
     end
 
     it "should return false if the block raises a StandardError" do
-      Facter::Util::Confine.new { raise StandardError }.true?.should be_false
+      expect(RFacter::Util::Confine.new { raise StandardError }.true?).to be(false)
     end
   end
 end
