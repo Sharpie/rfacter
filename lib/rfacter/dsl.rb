@@ -116,7 +116,7 @@ EOS
     #
     # @return [void]
     def self.each
-      COLLECTION.value.each do |*args|
+      COLLECTION.value.each(NODE.value) do |*args|
         yield(*args)
       end
     end

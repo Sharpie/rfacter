@@ -25,8 +25,8 @@ class RFacter::Util::Collection
   end
 
   # Return a fact object by name.
-  def [](name)
-    value(name)
+  def [](name, node)
+    value(name, node)
   end
 
   # Define a new fact or extend an existing fact.
@@ -65,12 +65,17 @@ class RFacter::Util::Collection
   include Enumerable
 
   # Iterate across all of the facts.
-  def each
+  def each(node)
     load_all
-    @facts.each do |name, fact|
-      value = fact.value
-      unless value.nil?
-        yield name.to_s, value
+
+    RFacter::DSL::COLLECTION.bind(self) do
+      RFacter::DSL::NODE.bind(node) do
+        @facts.each do |name, fact|
+          value = fact.value
+          unless value.nil?
+            yield name.to_s, value
+          end
+        end
       end
     end
   end
