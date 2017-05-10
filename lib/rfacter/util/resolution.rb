@@ -2,9 +2,6 @@ require 'forwardable'
 
 require 'rfacter'
 require_relative '../config'
-require_relative '../dsl'
-require_relative '../core/resolvable'
-require_relative '../core/suitable'
 
 # This represents a fact resolution. A resolution is a concrete
 # implementation of a fact. A single fact can have many resolutions and
@@ -18,6 +15,9 @@ require_relative '../core/suitable'
 #
 # @api public
 class RFacter::Util::Resolution
+  require_relative '../dsl'
+  require_relative '../core/resolvable'
+  require_relative '../core/suitable'
   extend Forwardable
 
   instance_delegate([:logger] => :@config)
