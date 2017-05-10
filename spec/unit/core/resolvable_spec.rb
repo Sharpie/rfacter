@@ -1,17 +1,29 @@
-require 'spec_helper'
-require 'facter/core/resolvable'
+require 'forwardable'
 
-describe Facter::Core::Resolvable do
+require 'spec_helper'
+require 'rfacter/core/resolvable'
+require 'rfacter/util/fact'
+
+describe RFacter::Core::Resolvable do
 
   class ResolvableClass
-    def initialize(name)
+    extend Forwardable
+    instance_delegate([:logger] => :@config)
+
+    def initialize(name, config: RFacter::Config.config)
       @name = name
-      @fact = Facter::Util::Fact.new("stub fact")
+      @fact = RFacter::Util::Fact.new("stub fact")
+      @config = config
     end
     attr_accessor :name, :resolve_value
     attr_reader :fact
-    include Facter::Core::Resolvable
+    include RFacter::Core::Resolvable
   end
+
+  let(:config) { instance_double('RFacter::Config::Settings') }
+  let(:logger) { instance_double('RFacter::Util::Logger') }
+  before(:each) { allow(config).to receive(:logger).and_return(logger) }
+  before(:each) { allow(RFacter::Config).to receive(:config).and_return(config) }
 
   subject { ResolvableClass.new('resolvable') }
 
@@ -31,30 +43,34 @@ describe Facter::Core::Resolvable do
     end
 
     it "normalizes the resolved value" do
-      Facter::Util::Normalization.expects(:normalize).returns 'stuff'
+      allow(RFacter::Util::Normalization).to receive(:normalize).and_return('stuff')
       subject.resolve_value = 'stuff'
       expect(subject.value).to eq('stuff')
     end
 
     it "logs a warning if an exception was raised" do
-      subject.expects(:resolve_value).raises RuntimeError, "kaboom!"
-      Facter.expects(:warn).with(regexp_matches(/Could not retrieve .*: kaboom!/))
+      expect(subject).to receive(:resolve_value).and_raise(RuntimeError, "kaboom!")
+      expect(logger).to receive(:log_exception).with(
+        RuntimeError,
+        /Could not retrieve .*: kaboom!/)
       expect(subject.value).to eq nil
     end
   end
 
   describe "timing out" do
     it "uses #limit instead of #timeout to determine the timeout period" do
-      subject.expects(:timeout).never
-      subject.expects(:limit).returns 25
+      expect(subject).to receive(:timeout).never
+      allow(subject).to receive(:limit).and_return(25)
 
-      Timeout.expects(:timeout).with(25)
+      expect(Timeout).to receive(:timeout).with(25)
       subject.value
     end
 
     it "returns nil if the timeout was reached" do
-      Facter.expects(:warn).with(regexp_matches(/Timed out after 0\.1 seconds while resolving/))
-      Timeout.expects(:timeout).raises Timeout::Error
+      expect(logger).to receive(:log_exception).with(
+        Timeout::Error,
+        /Timed out after 0\.1 seconds while resolving/)
+      allow(Timeout).to receive(:timeout).and_raise(Timeout::Error)
 
       subject.timeout = 0.1
 

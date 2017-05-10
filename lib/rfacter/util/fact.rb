@@ -2,8 +2,6 @@ require 'forwardable'
 
 require 'rfacter'
 require_relative '../config'
-require_relative '../core/aggregate'
-require_relative 'resolution'
 
 # This class represents a fact. Each fact has a name and multiple
 # {Facter::Util::Resolution resolutions}.
@@ -12,6 +10,9 @@ require_relative 'resolution'
 #
 # @api public
 class RFacter::Util::Fact
+  require_relative '../core/aggregate'
+  require_relative 'resolution'
+
   extend Forwardable
 
   instance_delegate([:logger] => :@config)
