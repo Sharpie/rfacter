@@ -15,6 +15,7 @@ EOS
   s.license = 'Apache-2.0'
   s.authors = ['Charlie Sharpsteen', 'Puppet Labs']
   s.email = 'source@sharpsteen.net'
+  s.homepage = 'https://github.com/Sharpie/rfacter'
   s.platform = Gem::Platform::RUBY
   s.files = Dir['bin/*'] + Dir['lib/**/*.rb']
   s.require_paths = ['lib']
