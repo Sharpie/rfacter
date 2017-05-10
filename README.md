@@ -1,65 +1,39 @@
-Facter
-======
+RFacter
+=======
 
-This package is largely meant to be a library for collecting facts about your
-system.  These facts are mostly strings (i.e., not numbers), and are things
-like the output of `uname`, public ssh keys, the number of processors, etc.
+RFacter is a (highly) experimental fork of [Facter 2.x][2.x] that executes facts
+defined in Ruby against remote systems over transports such as SSH and WinRM.
 
-See `bin/facter` for an example of the interface.
+  [2.x]: https://github.com/puppetlabs/facter/tree/2.x
 
-Installation
-------------
 
-Generally, you need the following things installed:
-
-* A supported Ruby version. Ruby 1.8.7, 1.9.3, and 2.0.0 (at least p195) are fully supported.
-
-Running Facter
+Running RFacter
 --------------
 
-Run the `facter` binary on the command for a full list of facts supported on
-your host.
+Run the `rfacter` binary on the command and pass it a list of nodes to inspect:
+
+    rfacter -n localhost -n some.remote.host \
+      -n winrm://Administrator:password@some.windows.box
+
+Special characters in passwords should be [percent-encoded][password-encoding].
+I.e. `V@grant!` would become `V%40grant%21`.
+
+  [password-encoding]: https://en.wikipedia.org/wiki/Percent-encoding
+
 
 Adding your own facts
 ---------------------
 
-See the [Adding Facts](http://docs.puppetlabs.com/guides/custom_facts.html)
-page for details of how to add your own custom facts to Facter.
+Currently, custom facts can only be added by setting the `RFACTERLIB`
+environment variable to a directories containing Ruby files:
 
-Running Specs
--------------
+    export RFACTERLIB=${HOME}/some_facts:/var/lib/rfacter/my_facts
 
-* bundle install --path .bundle/gems
-* bundle exec rake spec
+The directories should contain Ruby files with names matching the fact being
+defined. For example, the RFacter loader will expect `my_fact` to be defined in
+a file named `my_fact.rb` somewhere on the `RFACTERLIB` path. Custom facts can
+make use of the Facter 3 Ruby DSL:
 
-Note: external facts in the system facts.d directory can cause spec failures.
+  https://github.com/puppetlabs/facter/blob/master/Extensibility.md#custom-facts-compatibility
 
-Further Information
--------------------
-
-See http://www.puppetlabs.com/puppet/related-projects/facter for more details.
-
-Support
--------
-Please log tickets and issues at our [JIRA tracker](http://tickets.puppetlabs.com).  A [mailing
-list](https://groups.google.com/forum/?fromgroups#!forum/puppet-users) is
-available for asking questions and getting help from others. In addition there
-is an active #puppet channel on Freenode.
-
-We use semantic version numbers for our releases, and recommend that users stay
-as up-to-date as possible by upgrading to patch releases and minor releases as
-they become available.
-
-Bugfixes and ongoing development will occur in minor releases for the current
-major version. Security fixes will be backported to a previous major version on
-a best-effort basis, until the previous major version is no longer maintained.
-
-
-For example: If a security vulnerability is discovered in Facter 2.1.0, we
-would fix it in the 2 series, most likely as 2.1.1. Maintainers would then make
-a best effort to backport that fix onto the latest Facter 1.7 release.
-
-Long-term support, including security patches and bug fixes, is available for
-commercial customers. Please see the following page for more details:
-
-[Puppet Enterprise Support Lifecycle](http://puppetlabs.com/misc/puppet-enterprise-lifecycle)
+Additional methods of configuring the loader will be added in a future release.
