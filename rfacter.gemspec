@@ -25,6 +25,7 @@ EOS
   s.add_dependency 'concurrent-ruby',                           '~> 1.0'
 
   s.add_development_dependency 'inch',                          '~> 0.7'
+  s.add_development_dependency 'rspec',                         '~> 3.1'
 end
 
 # vim:ft=ruby

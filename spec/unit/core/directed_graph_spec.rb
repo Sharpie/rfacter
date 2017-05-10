@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'facter/core/directed_graph'
+require 'rfacter/core/directed_graph'
 
-describe Facter::Core::DirectedGraph do
+describe RFacter::Core::DirectedGraph do
   subject(:graph) { described_class.new }
 
   describe "detecting cycles" do
@@ -65,7 +65,7 @@ describe Facter::Core::DirectedGraph do
 
       expect {
         graph.tsort
-      }.to raise_error(Facter::Core::DirectedGraph::CycleError, /found the following cycles:/)
+      }.to raise_error(RFacter::Core::DirectedGraph::CycleError, /found the following cycles:/)
     end
 
     it "raises an error if there is an edge to a non-existent vertex" do
@@ -73,7 +73,7 @@ describe Facter::Core::DirectedGraph do
       graph[:two] = [:three]
       expect {
         graph.tsort
-      }.to raise_error(Facter::Core::DirectedGraph::MissingVertex, /missing elements.*three/)
+      }.to raise_error(RFacter::Core::DirectedGraph::MissingVertex, /missing elements.*three/)
     end
   end
 end

@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'facter/util/values'
+require 'rfacter/util/values'
 
-describe Facter::Util::Values do
+describe RFacter::Util::Values do
   describe 'deep_freeze' do
     it "it dups and freezes strings" do
       input = "hi"
@@ -44,7 +44,7 @@ describe Facter::Util::Values do
     it "raises an error when given a structure that cannot be deeply frozen" do
       expect {
         described_class.deep_freeze(Set.new)
-      }.to raise_error(Facter::Util::Values::DeepFreezeError, /Cannot deep freeze.*Set/)
+      }.to raise_error(RFacter::Util::Values::DeepFreezeError, /Cannot deep freeze.*Set/)
     end
   end
 
@@ -110,7 +110,7 @@ describe Facter::Util::Values do
 
         expect {
           described_class.deep_merge(first, second)
-        }.to raise_error(Facter::Util::Values::DeepMergeError, /Cannot merge .*at .*foo.*bar.*baz.*quux/)
+        }.to raise_error(RFacter::Util::Values::DeepMergeError, /Cannot merge .*at .*foo.*bar.*baz.*quux/)
       end
     end
 
@@ -123,7 +123,7 @@ describe Facter::Util::Values do
         it "raises an error when merging #{left}:#{left.class} and #{right}:#{right.class}" do
           expect {
             described_class.deep_merge(left, right)
-          }.to raise_error(Facter::Util::Values::DeepMergeError, /Cannot merge #{left.inspect}:#{left.class} and #{right.inspect}:#{right.class}/)
+          }.to raise_error(RFacter::Util::Values::DeepMergeError, /Cannot merge #{left.inspect}:#{left.class} and #{right.inspect}:#{right.class}/)
         end
       end
     end
