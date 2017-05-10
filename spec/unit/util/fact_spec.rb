@@ -1,30 +1,35 @@
 #! /usr/bin/env ruby
 
 require 'spec_helper'
-require 'facter/util/fact'
+require 'rfacter/util/fact'
 
-describe Facter::Util::Fact do
+describe RFacter::Util::Fact do
 
-  subject(:fact) { Facter::Util::Fact.new("yay") }
+  let(:config) { instance_double('RFacter::Config::Settings') }
+  let(:logger) { instance_double('RFacter::Util::Logger') }
+  before(:each) { allow(config).to receive(:logger).and_return(logger) }
+  before(:each) { allow(RFacter::Config).to receive(:config).and_return(config) }
 
-  let(:resolution) { Facter::Util::Resolution.new("yay", fact) }
+  subject(:fact) { RFacter::Util::Fact.new("yay") }
+
+  let(:resolution) { RFacter::Util::Resolution.new("yay", fact) }
 
   it "requires a name" do
-    expect { Facter::Util::Fact.new }.to raise_error(ArgumentError)
+    expect { RFacter::Util::Fact.new }.to raise_error(ArgumentError)
   end
 
   it "downcases and converts the name to a symbol" do
-    expect(Facter::Util::Fact.new("YayNess").name).to eq :yayness
+    expect(RFacter::Util::Fact.new("YayNess").name).to eq :yayness
   end
 
   it "issues a deprecation warning for use of ldapname" do
-    Facter.expects(:warnonce).with("ldapname is deprecated and will be removed in a future version")
-    Facter::Util::Fact.new("YayNess", :ldapname => "fooness")
+    expect(logger).to receive(:warnonce).with("ldapname is deprecated and will be removed in a future version")
+    RFacter::Util::Fact.new("YayNess", :ldapname => "fooness")
   end
 
   describe "when adding resolution mechanisms using #add" do
     it "delegates to #define_resolution with an anonymous resolution" do
-      subject.expects(:define_resolution).with(nil, {})
+      expect(subject).to receive(:define_resolution).with(nil, {})
       subject.add
     end
   end
@@ -46,14 +51,14 @@ describe Facter::Util::Fact do
   describe "adding resolution mechanisms by name" do
 
     let(:res) do
-      stub 'resolution',
+      double 'resolution',
         :name => 'named',
         :set_options => nil,
         :resolution_type => :simple
     end
 
     it "creates a new resolution if no such resolution exists" do
-      Facter::Util::Resolution.expects(:new).once.with('named', fact).returns(res)
+      expect(RFacter::Util::Resolution).to receive(:new).once.with('named', fact).and_return(res)
 
       fact.define_resolution('named')
 
@@ -62,17 +67,17 @@ describe Facter::Util::Fact do
 
     it "creates a simple resolution when the type is nil" do
       fact.define_resolution('named')
-      expect(fact.resolution('named')).to be_a_kind_of Facter::Util::Resolution
+      expect(fact.resolution('named')).to be_a_kind_of RFacter::Util::Resolution
     end
 
     it "creates a simple resolution when the type is :simple" do
       fact.define_resolution('named', :type => :simple)
-      expect(fact.resolution('named')).to be_a_kind_of Facter::Util::Resolution
+      expect(fact.resolution('named')).to be_a_kind_of RFacter::Util::Resolution
     end
 
     it "creates an aggregate resolution when the type is :aggregate" do
       fact.define_resolution('named', :type => :aggregate)
-      expect(fact.resolution('named')).to be_a_kind_of Facter::Core::Aggregate
+      expect(fact.resolution('named')).to be_a_kind_of RFacter::Core::Aggregate
     end
 
     it "raises an error if there is an existing resolution with a different type" do
@@ -84,7 +89,7 @@ describe Facter::Util::Fact do
     end
 
     it "returns existing resolutions by name" do
-      Facter::Util::Resolution.expects(:new).once.with('named', fact).returns(res)
+      expect(RFacter::Util::Resolution).to receive(:new).once.with('named', fact).and_return(res)
 
       fact.define_resolution('named')
       fact.define_resolution('named')
@@ -95,7 +100,9 @@ describe Facter::Util::Fact do
 
   describe "when returning a value" do
     it "returns nil if there are no resolutions" do
-      Facter::Util::Fact.new("yay").value.should be_nil
+      expect(logger).to receive(:debug).with(/No resolves for/)
+
+      expect(RFacter::Util::Fact.new("yay").value).to be_nil
     end
 
     it "prefers the highest weight resolution" do
@@ -126,15 +133,15 @@ describe Facter::Util::Fact do
 
   describe '#flush' do
     subject do
-      Facter::Util::Fact.new(:foo)
+      RFacter::Util::Fact.new(:foo)
     end
 
     it "invokes #flush on all resolutions" do
       simple = subject.add(:type => :simple)
-      simple.expects(:flush)
+      expect(simple).to receive(:flush)
 
       aggregate = subject.add(:type => :aggregate)
-      aggregate.expects(:flush)
+      expect(aggregate).to receive(:flush)
 
       subject.flush
     end
