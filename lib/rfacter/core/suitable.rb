@@ -4,7 +4,10 @@ require 'rfacter'
 # certain platforms and determining the run precedence of these objects.
 #
 # Classes that include the Suitable mixin should define a `#confines` method
-# that returns an Array of zero or more Facter::Util::Confine objects.
+# that returns an Array of zero or more {RFacter::Util::Confine} objects.
+#
+# @api private
+# @since 0.1.0
 module RFacter::Core::Suitable
   require_relative '../util/confine'
 
@@ -18,8 +21,6 @@ module RFacter::Core::Suitable
   # @param weight [Integer] the weight of this resolution
   #
   # @return [void]
-  #
-  # @api public
   def has_weight(weight)
     @weight = weight
   end
@@ -28,8 +29,6 @@ module RFacter::Core::Suitable
   # multiple forms of arguments to determine suitability.
   #
   # @return [void]
-  #
-  # @api public
   #
   # @overload confine(confines)
   #   Confine a fact to a specific fact value or values.  This form takes a
@@ -40,7 +39,7 @@ module RFacter::Core::Suitable
   #   @param [Hash{String,Symbol=>String,Array<String>}] confines set of facts identified by the hash keys whose
   #     fact value must match the argument value.
   #   @example Confining to Linux
-  #       Facter.add(:powerstates) do
+  #       RFacter.add(:powerstates) do
   #         # This resolution only makes sense on linux systems
   #         confine :kernel => "Linux"
   #         setcode do
@@ -56,7 +55,7 @@ module RFacter::Core::Suitable
   #   @param [Proc] block determines the suitability of the fact.  If the block
   #     evaluates to `false` or `nil` then the confined fact will not be
   #     evaluated.
-  #   @yield [value] the value of the fact identified by {confines}
+  #   @yield [value] the value of the fact identified by `confines`
   #   @example Confine the fact to a host with an ipaddress in a specific
   #     subnet
   #       confine :ipaddress do |addr|
@@ -95,8 +94,6 @@ module RFacter::Core::Suitable
   # specific resolution wins over a less specific one).
   #
   # @return [Integer] the weight of this resolution
-  #
-  # @api private
   def weight
     if @weight
       @weight
@@ -106,8 +103,6 @@ module RFacter::Core::Suitable
   end
 
   # Is this resolution mechanism suitable on the system in question?
-  #
-  # @api private
   def suitable?
     @confines.all? { |confine| confine.true? }
   end

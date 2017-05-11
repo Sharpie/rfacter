@@ -8,6 +8,7 @@ require 'rfacter'
 # if de-referenced to `nil`. This allows the creation of variables
 # that must always be bound to a specific value before use.
 #
+# @api private
 # @since 0.1.0
 class RFacter::Util::NonNullable < Concurrent::ThreadLocalVar
   # @param err_message [String] The error message to raise if

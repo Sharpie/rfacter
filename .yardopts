@@ -1,11 +1,4 @@
---protected
---private
 --verbose
 --markup markdown
---readme README_DEVELOPER.md
---tag status
---transitive-tag status
---tag comment
---hide-tag comment
---no-transitive-tag api
+--readme README.md
 lib/**/*.rb

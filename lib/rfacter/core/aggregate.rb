@@ -8,12 +8,12 @@ require_relative '../config'
 # Aggregates are evaluated in two parts: generating individual chunks and then
 # aggregating all chunks together. Each chunk is a block of code that generates
 # a value, and may depend on other chunks when it runs. After all chunks have
-# been evaluated they are passed to the aggregate block as Hash<name, result>.
+# been evaluated they are passed to the aggregate block as `Hash<name, result>`.
 # The aggregate block converts the individual chunks into a single value that is
 # returned as the final value of the aggregate.
 #
-# @api public
-# @since 2.0.0
+# @api private
+# @since 0.1.0
 class RFacter::Core::Aggregate
   require_relative 'directed_graph'
   require_relative 'resolvable'
@@ -32,19 +32,17 @@ class RFacter::Core::Aggregate
   attr_reader :name
 
   # @!attribute [r] deps
-  #   @api private
-  #   @return [Facter::Core::DirectedGraph]
+  #   @return [RFacter::Core::DirectedGraph]
   attr_reader :deps
 
   # @!attribute [r] confines
-  #   @return [Array<Facter::Core::Confine>] An array of confines restricting
+  #   @return [Array<RFacter::Core::Confine>] An array of confines restricting
   #     this to a specific platform
-  #   @see Facter::Core::Suitable
+  #   @see RFacter::Core::Suitable
   attr_reader :confines
 
   # @!attribute [r] fact
-  # @return [Facter::Util::Fact]
-  # @api private
+  # @return [RFacter::Util::Fact]
   attr_reader :fact
 
   def initialize(name, fact, config: RFacter::Config.config, **options)
@@ -83,8 +81,6 @@ class RFacter::Core::Aggregate
 
   # Define a new chunk for the given aggregate
   #
-  # @api public
-  #
   # @example Defining a chunk with no dependencies
   #   aggregate.chunk(:mountpoints) do
   #     # generate mountpoint information
@@ -119,8 +115,6 @@ class RFacter::Core::Aggregate
   end
 
   # Define how all chunks should be combined
-  #
-  # @api public
   #
   # @example Merge all chunks
   #   aggregate.aggregate do |chunks|
@@ -160,7 +154,7 @@ class RFacter::Core::Aggregate
 
   # Evaluate the results of this aggregate.
   #
-  # @see Facter::Core::Resolvable#value
+  # @see RFacter::Core::Resolvable#value
   # @return [Object]
   def resolve_value
     chunk_results = run_chunks()

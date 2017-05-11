@@ -13,6 +13,7 @@ require_relative 'node'
 # and contains methods for initializing the settings instance from
 # various sources.
 #
+# @api public
 # @since 0.1.0
 module RFacter::Config
   # Return global configuration

@@ -6,6 +6,7 @@ require_relative '../util/logger'
 # Instances of this class hold top-level configuration values and shared
 # service objects such as loggers.
 #
+# @api public
 # @since 0.1.0
 class RFacter::Config::Settings
   # Access the logger instance

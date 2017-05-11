@@ -10,6 +10,7 @@ require_relative 'fact'
 # around a hash of facts.
 #
 # @api private
+# @since 0.1.0
 class RFacter::Util::Collection
   # Ensures unqualified namespaces like `Facter` and `Facter::Util` get
   # re-directed to RFacter shims when the loader calls `instance_eval`
@@ -34,7 +35,7 @@ class RFacter::Util::Collection
   # @param name [Symbol] The name of the fact to define
   # @param options [Hash] A hash of options to set on the fact
   #
-  # @return [Facter::Util::Fact] The fact that was defined
+  # @return [RFacter::Util::Fact] The fact that was defined
   def define_fact(name, options = {}, &block)
     fact = create_or_return_fact(name, options)
 
@@ -53,7 +54,7 @@ class RFacter::Util::Collection
   # @param name [Symbol] The name of the fact to define
   # @param options [Hash] A hash of options to set on the fact and resolution
   #
-  # @return [Facter::Util::Fact] The fact that was defined
+  # @return [RFacter::Util::Fact] The fact that was defined
   def add(name, options = {}, &block)
     fact = create_or_return_fact(name, options)
 

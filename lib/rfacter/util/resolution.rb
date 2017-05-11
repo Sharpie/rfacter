@@ -6,14 +6,15 @@ require_relative '../config'
 # This represents a fact resolution. A resolution is a concrete
 # implementation of a fact. A single fact can have many resolutions and
 # the correct resolution will be chosen at runtime. Each time
-# {Facter.add} is called, a new resolution is created and added to the
-# set of resolutions for the fact named in the call.  Each resolution
-# has a {#has_weight weight}, which defines its priority over other
+# {RFacter::DSL::Facter.add Facter.add} is called, a new resolution is created
+# and added to the set of resolutions for the fact named in the call.  Each
+# resolution has a {#has_weight weight}, which defines its priority over other
 # resolutions, and a set of {#confine _confinements_}, which defines the
-# conditions under which it will be chosen. All confinements must be
-# satisfied for a fact to be considered _suitable_.
+# conditions under which it will be chosen. All confinements must be satisfied
+# for a fact to be considered _suitable_.
 #
-# @api public
+# @api private
+# @since 0.1.0
 class RFacter::Util::Resolution
   require_relative '../dsl'
   require_relative '../core/resolvable'
@@ -22,7 +23,6 @@ class RFacter::Util::Resolution
 
   instance_delegate([:logger] => :@config)
 
-  # @api private
   attr_accessor :code
   attr_writer :value
 
@@ -33,12 +33,10 @@ class RFacter::Util::Resolution
   # The name of this resolution. The resolution name should be unique with
   # respect to the given fact.
   # @return [String]
-  # @api public
   attr_accessor :name
 
   # @!attribute [r] fact
-  # @return [Facter::Util::Fact]
-  # @api private
+  # @return [RFacter::Util::Fact]
   attr_reader :fact
 
   def which(command)
@@ -53,8 +51,6 @@ class RFacter::Util::Resolution
   #
   # @param name [String] The name of the resolution.
   # @return [void]
-  #
-  # @api private
   def initialize(name, fact, config: RFacter::Config.config, **options)
     @name = name
     @fact = fact
@@ -130,8 +126,6 @@ class RFacter::Util::Resolution
   #   @param [Proc] block The block to determine the resolution's value.
   #     This block is run when the fact is evaluated. Errors raised from
   #     inside the block are rescued and printed to stderr.
-  #
-  # @api public
   def setcode(string = nil, &block)
     if string
       @code = Proc.new do

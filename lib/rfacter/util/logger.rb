@@ -11,6 +11,7 @@ require 'rfacter'
 #   - `debugonce`
 #   - `log_exception`
 #
+# @api private
 # @since 0.1.0
 class RFacter::Util::Logger < ::Logger
   @@warn_messages = Hash.new

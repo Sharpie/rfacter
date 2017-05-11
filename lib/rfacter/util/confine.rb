@@ -7,6 +7,9 @@ require_relative 'values'
 
 # A restricting tag for fact resolution mechanisms.  The tag must be true
 # for the resolution mechanism to be suitable.
+#
+# @api private
+# @since 0.1.0
 class RFacter::Util::Confine
   extend Forwardable
 

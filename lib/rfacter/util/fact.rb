@@ -4,11 +4,12 @@ require 'rfacter'
 require_relative '../config'
 
 # This class represents a fact. Each fact has a name and multiple
-# {Facter::Util::Resolution resolutions}.
+# {RFacter::Util::Resolution resolutions}.
 #
-# Create facts using {Facter.add}
+# Create facts using {RFacter::DSL::Facter.add Facter.add}
 #
-# @api public
+# @api private
+# @since 0.1.0
 class RFacter::Util::Fact
   require_relative '../core/aggregate'
   require_relative 'resolution'
@@ -25,13 +26,11 @@ class RFacter::Util::Fact
   # @deprecated
   attr_accessor :ldapname
 
-  # Creates a new fact, with no resolution mechanisms. See {Facter.add}
+  # Creates a new fact, with no resolution mechanisms. See {RFacter::DSL::Facter.add}
   # for the public API for creating facts.
   # @param name [String] the fact name
   # @param options [Hash] optional parameters
   # @option options [String] :ldapname set the ldapname property on the fact
-  #
-  # @api private
   def initialize(name, config: RFacter::Config.config, **options)
     @name = name.to_s.downcase.intern
     @config = config
@@ -46,15 +45,13 @@ class RFacter::Util::Fact
     @value = nil
   end
 
-  # Adds a new {Facter::Util::Resolution resolution}.  This requires a
+  # Adds a new {RFacter::Util::Resolution resolution}.  This requires a
   # block, which will then be evaluated in the context of the new
   # resolution.
   #
   # @param options [Hash] A hash of options to set on the resolution
   #
-  # @return [Facter::Util::Resolution]
-  #
-  # @api private
+  # @return [RFacter::Util::Resolution]
   def add(options = {}, &block)
     define_resolution(nil, options, &block)
   end
@@ -64,9 +61,7 @@ class RFacter::Util::Fact
   #
   # @param resolution_name [String] The name of the resolve to define or look up
   # @param options [Hash] A hash of options to set on the resolution
-  # @return [Facter::Util::Resolution]
-  #
-  # @api public
+  # @return [RFacter::Util::Resolution]
   def define_resolution(resolution_name, options = {}, &block)
 
     resolution_type = options.delete(:type) || :simple
@@ -85,7 +80,7 @@ class RFacter::Util::Fact
   #
   # @param name [String]
   #
-  # @return [Facter::Util::Resolution, nil] The resolution if exists, nil if
+  # @return [RFacter::Util::Resolution, nil] The resolution if exists, nil if
   #   it doesn't exist or name is nil
   def resolution(name)
     return nil if name.nil?
@@ -96,18 +91,14 @@ class RFacter::Util::Fact
   # Flushes any cached values.
   #
   # @return [void]
-  #
-  # @api private
   def flush
     @resolves.each { |r| r.flush }
     @value = nil
   end
 
   # Returns the value for this fact. This searches all resolutions by
-  # suitability and weight (see {Facter::Util::Resolution}). If no
+  # suitability and weight (see {RFacter::Util::Resolution}). If no
   # suitable resolution is found, it returns nil.
-  #
-  # @api public
   def value
     return @value if @value
 

@@ -1,5 +1,9 @@
 require 'rfacter'
 
+# Helper methods for coercing items to JSON datatypes
+#
+# @api private
+# @since 0.1.0
 module RFacter
   module Util
     # A util module for facter containing helper methods

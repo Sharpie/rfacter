@@ -8,6 +8,7 @@ require_relative '../dsl'
 # Load facts on demand.
 #
 # @api private
+# @since 0.1.0
 class RFacter::Util::Loader
   extend Forwardable
 
@@ -20,7 +21,6 @@ class RFacter::Util::Loader
 
   # Load all resolutions for a single fact.
   #
-  # @api public
   # @param fact [Symbol]
   def load(fact, collection)
     # Now load from the search path
@@ -40,8 +40,6 @@ class RFacter::Util::Loader
   end
 
   # Load all facts from all directories.
-  #
-  # @api public
   def load_all(collection)
     return if defined?(@loaded_all)
 
@@ -69,7 +67,6 @@ class RFacter::Util::Loader
   # A warning will be generated for paths that are not
   # absolute directories.
   #
-  # @api public
   # @return [Array<String>]
   def search_path
     search_paths = [File.expand_path('../../facts', __FILE__)]

@@ -5,6 +5,12 @@ require 'rfacter'
 
 module RFacter
   module Core
+    # Directed graph for sorting aggregate chunk dependencies
+    #
+    # @see RFacter::Core::Aggregate
+    #
+    # @api private
+    # @since 0.1.0
     class DirectedGraph < Hash
       include TSort
 

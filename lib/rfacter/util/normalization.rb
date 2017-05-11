@@ -1,5 +1,9 @@
 require 'rfacter'
 
+# Routines for normalizing fact return values
+#
+# @api private
+# @since 0.1.0
 module RFacter
   module Util
     module Normalization
@@ -11,7 +15,6 @@ module RFacter
 
       # Recursively normalize the given data structure
       #
-      # @api public
       # @raise [NormalizationError] If the data structure contained an invalid element.
       # @return [void]
       def normalize(value)
@@ -41,7 +44,6 @@ module RFacter
       # is UTF-8 and that the string content matches the encoding. If the string
       # is not an expected encoding then it is converted to UTF-8.
       #
-      # @api public
       # @raise [NormalizationError] If the string used an unsupported encoding or did not match its encoding
       # @param value [String]
       # @return [void]
@@ -72,7 +74,6 @@ module RFacter
 
       # Validate all elements of the array.
       #
-      # @api public
       # @raise [NormalizationError] If one of the elements failed validation
       # @param value [Array]
       # @return [void]
@@ -84,7 +85,6 @@ module RFacter
 
       # Validate all keys and values of the hash.
       #
-      # @api public
       # @raise [NormalizationError] If one of the keys or values failed normalization
       # @param value [Hash]
       # @return [void]

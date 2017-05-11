@@ -9,6 +9,9 @@ require_relative '../util/normalization'
 # Classes including this mixin should implement at #name method describing
 # the value being resolved and a #resolve_value that actually executes the code
 # to resolve the value.
+#
+# @api private
+# @since 0.1.0
 module RFacter::Core::Resolvable
 
   # The timeout, in seconds, for evaluating this resolution.
@@ -19,11 +22,11 @@ module RFacter::Core::Resolvable
   # Return the timeout period for resolving a value.
   # (see #timeout)
   # @return [Numeric]
-  # @comment requiring 'timeout' stdlib class causes Object#timeout to be
-  #   defined which delegates to Timeout.timeout. This method may potentially
-  #   overwrite the #timeout attr_reader on this class, so we define #limit to
-  #   avoid conflicts.
   def limit
+    # requiring 'timeout' stdlib class causes Object#timeout to be defined
+    # which delegates to Timeout.timeout. This method may potentially overwrite
+    # the #timeout attr_reader on this class, so we define #limit to avoid
+    # conflicts.
     @timeout || 0
   end
 
@@ -39,8 +42,7 @@ module RFacter::Core::Resolvable
   # Please see the Solaris zones fact for an example of how this feature may be
   # used.
   #
-  # @see Facter::Util::Fact#flush
-  # @see Facter::Util::Resolution#flush
+  # @see RFacter::Util::Fact#flush
   #
   # @api public
   def on_flush(&block)
@@ -48,10 +50,9 @@ module RFacter::Core::Resolvable
   end
 
   ##
-  # flush executes the block, if any, stored by the {on_flush} method
+  # flush executes the block, if any, stored by the {#on_flush} method
   #
-  # @see Facter::Util::Fact#flush
-  # @see Facter::Util::Resolution#on_flush
+  # @see RFacter::Util::Fact#flush
   #
   # @api private
   def flush

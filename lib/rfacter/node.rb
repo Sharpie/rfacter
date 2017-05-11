@@ -13,6 +13,7 @@ require 'concurrent'
 # @note This class should be refacter to provide an abstracted interface to
 #   different transport backends like Train, Vagrant, Chloride, etc.
 #
+# @api public
 # @since 0.1.0
 class RFacter::Node
   extend Forwardable

@@ -7,9 +7,10 @@ require_relative 'util/non_nullable'
 # Facter compatibility layer
 #
 # This module exists to provide compatibility shims for Facter DSL methods as
-# exposed by the Facter 3.0 Ruby API. Any fact source code that is executed
-# within the {RFacter::Util} namespace via `instance_eval` should pick up on
-# these shims. The methods in this module should never be called directly.
+# exposed by the Facter 3 Ruby Extension API. Any fact source code that is
+# loaded into a {RFacter::Util::Collection} instance via `instance_eval`
+# should pick up on these shims. The methods in this module should never be
+# called outside of files that define custom facts.
 #
 # However, lexical scope is a tricky thing, so "should" is the operative word
 # here.
@@ -60,7 +61,7 @@ EOS
     #   of {RFacter::Util::Fact} and {Facter::Util::Resolution} can be
     #   supplied here
     # @option options [Integer] :timeout set the
-    #   {RFacter::Util::Resolution#timeout timeout} for this resolution
+    #   {RFacter::Core::Resolvable#timeout timeout} for this resolution
     # @param block [Proc] a block defining a fact resolution
     #
     # @return [RFacter::Util::Fact] the fact object, which includes any previously
@@ -304,11 +305,11 @@ EOS
     # Facter::Util DSL methods
     module Util
       require_relative 'util/fact'
-      # (see RFacter::Util::Fact)
+      # @see RFacter::Util::Fact
       Fact = ::RFacter::Util::Fact
 
       require_relative 'util/resolution'
-      # (see RFacter::Util::Resolution)
+      # @see RFacter::Util::Resolution
       Resolution = ::RFacter::Util::Resolution
 
       # Methods for interacting with remote files.

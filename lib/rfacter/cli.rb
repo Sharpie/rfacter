@@ -7,6 +7,10 @@ require_relative 'config'
 require_relative 'node'
 require_relative 'util/collection'
 
+# RFacter Command Line Interface module
+#
+# @api public
+# @since 0.1.0
 module RFacter::CLI
   extend SingleForwardable
 
