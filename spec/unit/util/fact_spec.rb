@@ -22,11 +22,6 @@ describe RFacter::Util::Fact do
     expect(RFacter::Util::Fact.new("YayNess").name).to eq :yayness
   end
 
-  it "issues a deprecation warning for use of ldapname" do
-    expect(logger).to receive(:warnonce).with("ldapname is deprecated and will be removed in a future version")
-    RFacter::Util::Fact.new("YayNess", :ldapname => "fooness")
-  end
-
   describe "when adding resolution mechanisms using #add" do
     it "delegates to #define_resolution with an anonymous resolution" do
       expect(subject).to receive(:define_resolution).with(nil, {})

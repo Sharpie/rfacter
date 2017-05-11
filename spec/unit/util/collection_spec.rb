@@ -32,8 +32,6 @@ describe RFacter::Util::Collection do
 
     describe "and a block is provided" do
       it "should use the block to add a resolution to the fact" do
-        allow(fact).to receive(:extract_ldapname_option!)
-
         allow(RFacter::Util::Fact).to receive(:new).and_return(fact)
 
         expect(fact).to receive(:add)
@@ -66,13 +64,6 @@ describe RFacter::Util::Collection do
     it "returns an existing fact if the fact has already been defined" do
       fact = subject.define_fact(:newfact)
       expect(subject.define_fact(:newfact)).to equal fact
-    end
-
-    it "passes options to newly generated facts" do
-      expect(logger).to receive(:warnonce).with(/deprecated/)
-
-      fact = subject.define_fact(:newfact, :ldapname => 'NewFact')
-      expect(fact.ldapname).to eq 'NewFact'
     end
 
     it "logs a warning if the fact could not be defined" do

@@ -154,8 +154,6 @@ class RFacter::Util::Collection
     if fact.nil?
       fact = RFacter::Util::Fact.new(name, options)
       @facts[name] = fact
-    else
-      fact.extract_ldapname_option!(options)
     end
 
     fact

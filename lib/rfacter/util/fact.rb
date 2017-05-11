@@ -22,22 +22,13 @@ class RFacter::Util::Fact
   # @return [String]
   attr_accessor :name
 
-  # @return [String]
-  # @deprecated
-  attr_accessor :ldapname
-
   # Creates a new fact, with no resolution mechanisms. See {RFacter::DSL::Facter.add}
   # for the public API for creating facts.
   # @param name [String] the fact name
   # @param options [Hash] optional parameters
-  # @option options [String] :ldapname set the ldapname property on the fact
   def initialize(name, config: RFacter::Config.config, **options)
     @name = name.to_s.downcase.intern
     @config = config
-
-    extract_ldapname_option!(options)
-
-    @ldapname ||= @name.to_s
 
     @resolves = []
     @searching = false
@@ -116,15 +107,6 @@ class RFacter::Util::Fact
       announce_when_no_value_found(@value)
 
       @value
-    end
-  end
-
-  # @api private
-  # @deprecated
-  def extract_ldapname_option!(options)
-    if options[:ldapname]
-      logger.warnonce("ldapname is deprecated and will be removed in a future version")
-      self.ldapname = options.delete(:ldapname)
     end
   end
 
