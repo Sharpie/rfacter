@@ -1,6 +1,8 @@
 RFacter
 =======
 
+[![Build Status](https://travis-ci.org/Sharpie/rfacter.svg?branch=master)](https://travis-ci.org/Sharpie/rfacter)
+
 RFacter is a (highly) experimental fork of [Facter 2.x][2.x] that executes facts
 defined in Ruby against remote systems over transports such as SSH and WinRM.
 
