@@ -76,6 +76,10 @@ module RFacter::Config
       settings.logger.level = Logger::DEBUG
     end
 
+    parser.on('-t', '--timing', 'Enable timing.') do
+      settings.timing = true
+    end
+
     parser.on('-n', '--node', '=MANDATORY', URI, 'Add a node by URI.') do |uri|
       node = RFacter::Node.new(uri)
       settings.nodes[node.hostname] = node

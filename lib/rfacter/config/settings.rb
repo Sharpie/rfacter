@@ -23,10 +23,16 @@ class RFacter::Config::Settings
   #   schemes to use when contacting them.
   attr_reader :nodes
 
+  # A boolean switch for measuring fact resolution time
+  #
+  # @return [Boolean] Defaults to false.
+  attr_accessor :timing
+
   def initialize(**options)
     @logger = RFacter::Util::Logger.new($stderr)
     @logger.level = Logger::WARN
 
+    @timing = false
     @nodes = Hash.new
   end
 end

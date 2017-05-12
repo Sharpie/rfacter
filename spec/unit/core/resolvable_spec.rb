@@ -51,6 +51,20 @@ describe RFacter::Core::Resolvable do
         /Could not retrieve .*: kaboom!/)
       expect(subject.value).to eq nil
     end
+
+    it 'does not collect measurements when timing is disabled' do
+      allow(config).to receive(:timing).and_return(false)
+      expect(Process).to receive(:clock_gettime).never
+
+      subject.value
+    end
+
+    it 'logs elapsed time when timining is enabled' do
+      allow(config).to receive(:timing).and_return(true)
+      expect(logger).to receive(:info)
+
+      subject.value
+    end
   end
 
   describe "timing out" do

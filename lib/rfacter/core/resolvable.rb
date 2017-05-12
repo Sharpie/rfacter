@@ -83,13 +83,16 @@ module RFacter::Core::Resolvable
   private
 
   def with_timing
-    starttime = Time.now.to_f
+    unless @config.timing
+      yield
+    else
+      starttime = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
+      yield
+      finishtime = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
 
-    yield
-
-    finishtime = Time.now.to_f
-    ms = (finishtime - starttime) * 1000
-    #::Facter.show_time "#{qualified_name}: #{"%.2f" % ms}ms"
+      elapsed = (finishtime - starttime)
+      logger.info { "#{qualified_name}: #{"%.2f" % elapsed}ms" }
+    end
   end
 
   def qualified_name
