@@ -2,13 +2,9 @@ require 'spec_helper'
 require 'rfacter/core/aggregate'
 
 describe RFacter::Core::Aggregate do
+  include_context 'mock rfacter configuration'
 
   let(:fact) { double('stub_fact', :name => 'stub_fact') }
-
-  let(:config) { instance_double('RFacter::Config::Settings') }
-  let(:logger) { instance_double('RFacter::Util::Logger') }
-  before(:each) { allow(config).to receive(:logger).and_return(logger) }
-  before(:each) { allow(RFacter::Config).to receive(:config).and_return(config) }
 
   subject { obj = described_class.new('aggregated', fact) }
 

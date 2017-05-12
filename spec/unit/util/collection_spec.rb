@@ -4,10 +4,7 @@ require 'spec_helper'
 require 'rfacter/util/collection'
 
 describe RFacter::Util::Collection do
-  let(:config) { instance_double('RFacter::Config::Settings') }
-  let(:logger) { instance_double('RFacter::Util::Logger') }
-  before(:each) { allow(config).to receive(:logger).and_return(logger) }
-  before(:each) { allow(RFacter::Config).to receive(:config).and_return(config) }
+  include_context 'mock rfacter configuration'
 
   let(:node) { instance_double('RFacter::Node') }
   let(:fact) { instance_double('RFacter::Util::Fact') }

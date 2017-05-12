@@ -4,11 +4,7 @@ require 'spec_helper'
 require 'rfacter/util/fact'
 
 describe RFacter::Util::Fact do
-
-  let(:config) { instance_double('RFacter::Config::Settings') }
-  let(:logger) { instance_double('RFacter::Util::Logger') }
-  before(:each) { allow(config).to receive(:logger).and_return(logger) }
-  before(:each) { allow(RFacter::Config).to receive(:config).and_return(config) }
+  include_context 'mock rfacter configuration'
 
   subject(:fact) { RFacter::Util::Fact.new("yay") }
 
