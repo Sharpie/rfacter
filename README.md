@@ -20,6 +20,9 @@ Run the `rfacter` binary on the command and pass it a list of nodes to inspect:
 Special characters in passwords should be [percent-encoded][password-encoding].
 I.e. `V@grant!` would become `V%40grant%21`.
 
+See [`examples/fact_lookup.rb`](examples/fact_lookup.rb) for an example of
+using RFacter as a library.
+
   [password-encoding]: https://en.wikipedia.org/wiki/Percent-encoding
 
 
