@@ -25,9 +25,9 @@ EOS
   s.add_dependency 'train',                                     '~> 0.23.0'
   s.add_dependency 'concurrent-ruby',                           '~> 1.0'
 
-  s.add_development_dependency 'inch',                          '~> 0.7'
   s.add_development_dependency 'rake',                          '~> 12.0'
   s.add_development_dependency 'rspec',                         '~> 3.1'
+  s.add_development_dependency 'yard',                          '~> 0.9'
 end
 
 # vim:ft=ruby
