@@ -105,7 +105,7 @@ EOS
     #
     # @return [RFacter::Util::Fact] The fact that was defined
     #
-    # @see {RFacter::Util::Collection#define_fact}
+    # @see RFacter::Util::Collection#define_fact
     def self.define_fact(name, options = {}, &block)
       COLLECTION.value.define_fact(name, options, &block)
     end
