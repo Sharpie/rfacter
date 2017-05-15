@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Timing of fact resolutions has been re-added. The `rfacter` CLI also accepts
   a `--timing` flag.
+- A suite of Acceptance tests powered by beaker-rspec.
 
 ### Removed
 - The `ldapname` option has been retired from RFacter::Util::Fact.
