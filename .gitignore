@@ -6,3 +6,4 @@ Gemfile.local
 *.gem
 doc
 log
+profiles
