@@ -1,0 +1,26 @@
+---
+HOSTS:
+  fedora25:
+    platform: fedora-25-x86_64
+    hypervisor: docker
+    image: fedora:25
+    docker_preserve_image: true
+    docker_cmd: '["/sbin/init"]'
+  centos7:
+    platform: el-7-x86_64
+    hypervisor: docker
+    image: centos:centos7
+    docker_preserve_image: true
+    docker_cmd: '["/sbin/init"]'
+  oracle7:
+    platform: el-7-x86_64
+    hypervisor: docker
+    image: oraclelinux:7
+    docker_preserve_image: true
+    docker_cmd: '["/sbin/init"]'
+  centos6:
+    platform: el-6-x86_64
+    hypervisor: docker
+    image: centos:centos6
+    docker_preserve_image: true
+    docker_cmd: '["/sbin/init"]'

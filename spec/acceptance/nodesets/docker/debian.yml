@@ -1,0 +1,25 @@
+---
+HOSTS:
+  debian8:
+    platform: debian-8-amd64
+    hypervisor: docker
+    image: debian:8
+    docker_preserve_image: true
+    docker_cmd: '["/sbin/init"]'
+  ubuntu1604:
+    platform: ubuntu-16.04-amd64
+    hypervisor: docker
+    image: ubuntu:16.04
+    docker_preserve_image: true
+    docker_cmd: '["/sbin/init"]'
+# FIXME: Disabled because sshd doesn't come up when the container is
+# booted. This causes Beaker to hang indefinitely tryng to establish a
+# connection.
+# ubuntu1404:
+#   platform: ubuntu-14.04-amd64
+#   hypervisor: docker
+#   image: ubuntu:14.04
+#   docker_preserve_image: true
+#   docker_cmd: '["/sbin/init"]'
+#   docker_image_commands:
+#     - 'sudo update-rc.d ssh defaults'

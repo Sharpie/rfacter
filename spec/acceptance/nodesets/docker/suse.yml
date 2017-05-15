@@ -1,0 +1,10 @@
+---
+HOSTS:
+  opensuse13:
+    platform: sles-13-x86_64
+    hypervisor: docker
+    image: opensuse:13.2
+    docker_preserve_image: true
+    docker_cmd: '["/usr/lib/systemd/systemd"]'
+    docker_image_commands:
+      - 'systemctl enable sshd'
