@@ -3,3 +3,9 @@
 ENV['BEAKER_set'] ||= 'docker/default'
 
 require 'beaker-rspec'
+require 'rspec-prof'
+
+# Enable profiling by running the acceptance suite with:
+#
+#     RSPEC_PROFILE=all
+RSpecProf.printer_class = RubyProf::GraphHtmlPrinter
