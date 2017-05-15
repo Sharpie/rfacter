@@ -1,7 +1,7 @@
 language: ruby
 sudo: false
 bundler_args: '--without acceptance'
-script: 'bundle exec rspec spec:unit'
+script: 'bundle exec rake spec:unit'
 notifications:
   email: false
 rvm:
