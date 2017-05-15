@@ -1,0 +1,39 @@
+---
+# TODO: A selection of platforms that represent the commercially
+# supported Linux OSes.
+HOSTS:
+  centos7:
+    platform: el-7-x86_64
+    hypervisor: docker
+    image: centos:centos7
+    docker_preserve_image: true
+    docker_cmd: '["/sbin/init"]'
+  centos6:
+    platform: el-6-x86_64
+    hypervisor: docker
+    image: centos:centos6
+    docker_preserve_image: true
+    docker_cmd: '["/sbin/init"]'
+
+  ubuntu1604:
+    platform: ubuntu-16.04-amd64
+    hypervisor: docker
+    image: ubuntu:16.04
+    docker_preserve_image: true
+    docker_cmd: '["/sbin/init"]'
+
+  # TODO: Should really test against SLES 12. Official Docker images for this
+  # platform do exist, but they appear to be published via the sle2docker
+  # package which requires a SLE subscription, instead of publicly available
+  # from Docker hub.
+  #
+  # https://www.suse.com/documentation/sles-12/singlehtml/book_sles_docker/book_sles_docker.html#Building_Pre-build_Images
+  opensuse13:
+    platform: sles-13-x86_64
+    hypervisor: docker
+    image: opensuse:13.2
+    docker_preserve_image: true
+    docker_cmd: '["/usr/lib/systemd/systemd"]'
+    docker_image_commands:
+      # Beaker only communicates via SSH. Ensure the daemon is up and running.
+      - 'systemctl enable sshd'
