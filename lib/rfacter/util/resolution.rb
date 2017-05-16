@@ -79,14 +79,7 @@ class RFacter::Util::Resolution
 
     instance_eval(&block)
 
-    # Ruby 1.9+ provides the source location of procs which can provide useful
-    # debugging information if a resolution is being evaluated twice. Since 1.8
-    # doesn't support this we opportunistically provide this information.
-    if block.respond_to? :source_location
-      @last_evaluated = block.source_location.join(':')
-    else
-      @last_evaluated = true
-    end
+    @last_evaluated = block.source_location.join(':')
   end
 
   def set_options(options)
