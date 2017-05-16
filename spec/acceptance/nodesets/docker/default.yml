@@ -37,3 +37,9 @@ HOSTS:
     docker_image_commands:
       # Beaker only communicates via SSH. Ensure the daemon is up and running.
       - 'systemctl enable sshd'
+
+CONFIG:
+  # Beaker requirements are layered into the docker image at provision time.
+  # Therefore, validating their presence is a waste of time and can cause hangs
+  # during offline development.
+  validate: false

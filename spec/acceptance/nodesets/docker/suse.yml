@@ -8,3 +8,9 @@ HOSTS:
     docker_cmd: '["/usr/lib/systemd/systemd"]'
     docker_image_commands:
       - 'systemctl enable sshd'
+
+CONFIG:
+  # Beaker requirements are layered into the docker image at provision time.
+  # Therefore, validating their presence is a waste of time and can cause hangs
+  # during offline development.
+  validate: false

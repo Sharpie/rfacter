@@ -24,3 +24,9 @@ HOSTS:
     image: centos:centos6
     docker_preserve_image: true
     docker_cmd: '["/sbin/init"]'
+
+CONFIG:
+  # Beaker requirements are layered into the docker image at provision time.
+  # Therefore, validating their presence is a waste of time and can cause hangs
+  # during offline development.
+  validate: false
