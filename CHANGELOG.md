@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Breaking Changes
+
+  - The `RFacter::Util::Collection` class now requires a `RFacter::Node`
+    instance to be passed to its constructor. Instance methods like
+    `value` and `to_hash` no longer accept a node argument. This change
+    means that a separate collection must be created for each node, but
+    simplifies per-node caching behavior.
+
 ### Added
 - Timing of fact resolutions has been re-added. The `rfacter` CLI also accepts
   a `--timing` flag.

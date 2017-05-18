@@ -26,25 +26,19 @@ module RFacter::CLI
 
     logger.info('cli::run') { "Configured nodes: #{@config.nodes.values.map(&:hostname)}" }
 
-    collection = RFacter::Util::Collection.new
-    collection.load_all
+    facts = @config.nodes.values.each_with_object({}) do |node, h|
+      collection = RFacter::Util::Collection.new(node)
+      collection.load_all
 
-    facts = @config.nodes.values.inject(Hash.new) do |h, node|
       node_facts = if names.empty?
-        collection.to_hash(node)
+        collection.to_hash
       else
-        names.inject(Hash.new) do |n, name|
-          n[name] = collection.value(name, node)
-          n
+        names.each_with_object({}) do |name, n|
+          n[name] = collection.value(name)
         end
       end
 
-      # TODO: Implement proper per-node Fact caching so that we don't just
-      # reset the colleciton on each loop.
-      collection.flush
-
       h[node.hostname] = node_facts
-      h
     end
 
 

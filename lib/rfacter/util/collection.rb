@@ -6,8 +6,10 @@ require_relative '../dsl'
 require_relative 'loader'
 require_relative 'fact'
 
-# Manage which facts exist and how we access them.  Largely just a wrapper
-# around a hash of facts.
+# Manage which facts exist on a Node and how we access them.
+#
+# Largely just a wrapper around a hash of facts that have been retrieved from a
+# particular node.
 #
 # @api private
 # @since 0.1.0
@@ -19,15 +21,21 @@ class RFacter::Util::Collection
 
   instance_delegate([:logger] => :@config)
 
-  def initialize(config: RFacter::Config.config, **opts)
+  # Initialize a new Collection object
+  #
+  # @param node [RFacter::Node] The node from which this collection
+  #   should retrieve facts.
+  def initialize(node, config: RFacter::Config.config, **opts)
+    @node = node
     @config = config
+
     @facts = Hash.new
     @internal_loader = RFacter::Util::Loader.new
   end
 
   # Return a fact object by name.
-  def [](name, node)
-    value(name, node)
+  def [](name)
+    value(name)
   end
 
   # Define a new fact or extend an existing fact.
@@ -66,11 +74,11 @@ class RFacter::Util::Collection
   include Enumerable
 
   # Iterate across all of the facts.
-  def each(node)
+  def each
     load_all
 
     RFacter::DSL::COLLECTION.bind(self) do
-      RFacter::DSL::NODE.bind(node) do
+      RFacter::DSL::NODE.bind(@node) do
         @facts.each do |name, fact|
           value = fact.value
           unless value.nil?
@@ -119,10 +127,10 @@ class RFacter::Util::Collection
   end
 
   # Return a hash of all of our facts.
-  def to_hash(node)
+  def to_hash
     @facts.inject({}) do |h, ary|
       resolved_value = RFacter::DSL::COLLECTION.bind(self) do
-        RFacter::DSL::NODE.bind(node) do
+        RFacter::DSL::NODE.bind(@node) do
           ary[1].value
         end
       end
@@ -134,9 +142,9 @@ class RFacter::Util::Collection
     end
   end
 
-  def value(name, node)
+  def value(name)
     RFacter::DSL::COLLECTION.bind(self) do
-      RFacter::DSL::NODE.bind(node) do
+      RFacter::DSL::NODE.bind(@node) do
         if fact = fact(name)
           fact.value
         end

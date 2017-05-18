@@ -117,7 +117,7 @@ EOS
     #
     # @return [void]
     def self.each
-      COLLECTION.value.each(NODE.value) do |*args|
+      COLLECTION.value.each do |*args|
         yield(*args)
       end
     end
@@ -186,7 +186,7 @@ EOS
     #
     # @return [Hash{String => Object}] the hash of fact names and values
     def self.to_hash
-      COLLECTION.value.to_hash(NODE.value)
+      COLLECTION.value.to_hash
     end
 
     # Gets the value for a fact.
@@ -196,7 +196,7 @@ EOS
     # @return [Object, nil] the value of the fact, or nil if no fact is
     #   found
     def self.value(name)
-      COLLECTION.value.value(name, NODE.value)
+      COLLECTION.value.value(name)
     end
 
     # Returns the current RFacter version

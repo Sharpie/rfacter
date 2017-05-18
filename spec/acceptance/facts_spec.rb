@@ -7,9 +7,7 @@ require 'rfacter/util/collection'
 
 describe RFacter do
   before(:all) do
-    collection = RFacter::Util::Collection.new
-    collection.load_all
-    @facts = hosts.inject(Hash.new) do |hash, host|
+    @facts = hosts.each_with_object({}) do |host, hash|
       config = host.host_hash
       ip = config[:ip]
       username = config[:user]
@@ -18,12 +16,12 @@ describe RFacter do
 
       node = RFacter::Node.new("ssh://#{username}:#{CGI.escape(password)}@#{ip}:#{port}")
 
+      collection = RFacter::Util::Collection.new(node)
+      collection.load_all
+
       # NOTE: Get hostname from Beaker host since these will all be sharing the
       # same IP address.
-      hash[host.hostname] = collection.to_hash(node)
-      collection.flush
-
-      hash
+      hash[host.hostname] = collection.to_hash
     end
   end
 

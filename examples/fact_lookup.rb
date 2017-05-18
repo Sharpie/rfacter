@@ -22,17 +22,11 @@ node_urls = [
 
 nodes = node_urls.map {|u| RFacter::Node.new(u) }
 
-facts = RFacter::Util::Collection.new
-facts.load_all # Load all fact definitions
+fact_data = nodes.each_with_object({}) do |node, hash|
+  facts = RFacter::Util::Collection.new(node)
+  facts.load_all # Load all fact definitions
 
-fact_data = nodes.inject(Hash.new) do |hash, node|
-  hash[node.hostname] = facts.to_hash(node)
-  # Flush is needed for now to clear values cached by the Collection class so
-  # that a different node can be looked up. This requirement will go away when
-  # the caching layer is updated to be node-aware.
-  facts.flush
-
-  hash
+  hash[node.hostname] = facts.to_hash
 end
 
 puts PP.pp(fact_data, '')

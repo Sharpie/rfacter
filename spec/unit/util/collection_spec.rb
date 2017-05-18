@@ -8,6 +8,7 @@ describe RFacter::Util::Collection do
 
   let(:node) { instance_double('RFacter::Node') }
   let(:fact) { instance_double('RFacter::Util::Fact') }
+  subject { described_class.new(node) }
 
   describe "when adding facts" do
     it "should create a new fact if no fact with the same name already exists" do
@@ -47,7 +48,7 @@ describe RFacter::Util::Collection do
             raise "kaboom!"
           end
         }.to_not raise_error
-        expect(subject.value('yay', node)).to be_nil
+        expect(subject.value('yay')).to be_nil
       end
     end
   end
@@ -98,22 +99,22 @@ describe RFacter::Util::Collection do
     end
 
     it "should return the result of calling :value on the fact" do
-      expect(subject.value("YayNess", node)).to eq("result")
+      expect(subject.value("YayNess")).to eq("result")
     end
 
     it "should be case-insensitive" do
-      expect(subject.value("yayness", node)).to eq("result")
+      expect(subject.value("yayness")).to eq("result")
     end
 
     it "should treat strings and symbols equivalently" do
-      expect(subject.value(:yayness, node)).to eq("result")
+      expect(subject.value(:yayness)).to eq("result")
     end
   end
 
   it "should return the fact's value when the array index method is used" do
     subject.add("myfact", :value => "foo")
 
-    expect(subject["myfact", node]).to eq("foo")
+    expect(subject["myfact"]).to eq("foo")
   end
 
   it "should have a method for flushing all facts" do
@@ -135,14 +136,14 @@ describe RFacter::Util::Collection do
     it "should return a hash of fact names and values with the fact names as strings" do
       subject.add(:one, :value => "me")
 
-      expect(subject.to_hash(node)).to eq({"one" => "me"})
+      expect(subject.to_hash).to eq({"one" => "me"})
     end
 
     it "should not include facts that did not return a value" do
       subject.add(:two, :value => nil)
       expect(logger).to receive(:debug).with(/still nil/)
 
-      expect(subject.to_hash(node)).to_not include(:two)
+      expect(subject.to_hash).to_not include(:two)
     end
   end
 
@@ -157,7 +158,7 @@ describe RFacter::Util::Collection do
 
     it "should yield each fact name and the fact value" do
       facts = {}
-      subject.each(node) do |fact, value|
+      subject.each do |fact, value|
         facts[fact] = value
       end
       expect(facts).to eq({"one" => "ONE", "two" => "TWO"})
@@ -165,7 +166,7 @@ describe RFacter::Util::Collection do
 
     it "should convert the fact name to a string" do
       facts = {}
-      subject.each(node) do |fact, value|
+      subject.each do |fact, value|
         expect(fact).to be_instance_of(String)
       end
     end
@@ -175,7 +176,7 @@ describe RFacter::Util::Collection do
       expect(logger).to receive(:debug).with(/still nil/)
       facts = {}
 
-      subject.each(node) do |fact, value|
+      subject.each do |fact, value|
         facts[fact] = value
       end
 
