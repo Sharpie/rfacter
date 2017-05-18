@@ -77,8 +77,8 @@ class RFacter::Util::Collection
   def each
     load_all
 
-    RFacter::DSL::COLLECTION.bind(self) do
-      RFacter::DSL::NODE.bind(@node) do
+    COLLECTION.bind(self) do
+      NODE.bind(@node) do
         @facts.each do |name, fact|
           value = fact.value
           unless value.nil?
@@ -128,23 +128,21 @@ class RFacter::Util::Collection
 
   # Return a hash of all of our facts.
   def to_hash
-    @facts.inject({}) do |h, ary|
-      resolved_value = RFacter::DSL::COLLECTION.bind(self) do
-        RFacter::DSL::NODE.bind(@node) do
-          ary[1].value
+    COLLECTION.bind(self) do
+      NODE.bind(@node) do
+        @facts.each_with_object({}) do |(name, fact), hash|
+          resolved_value = fact.value
+
+          # For backwards compatibility, convert the fact name to a string.
+          hash[name.to_s] = resolved_value unless resolved_value.nil?
         end
       end
-
-      # For backwards compatibility, convert the fact name to a string.
-      h[ary[0].to_s] = resolved_value unless resolved_value.nil?
-
-      h
     end
   end
 
   def value(name)
-    RFacter::DSL::COLLECTION.bind(self) do
-      RFacter::DSL::NODE.bind(@node) do
+    COLLECTION.bind(self) do
+      NODE.bind(@node) do
         if fact = fact(name)
           fact.value
         end
