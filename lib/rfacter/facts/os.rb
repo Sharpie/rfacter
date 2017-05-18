@@ -40,21 +40,56 @@ Facter.add(:os, :type => :aggregate) do
     # stats and reads, so multiple file ops only incur a cost once. However,
     # these ops are all going over the network, so we should probably
     # prioritize RedHat and SuSE detection over less common Linuxen in order to
-    # cut down on network chatter that will be useless in most cases. Also,
-    # might be worth adding /etc/os-release detection at the front of the list
-    # since that's the new hotness from systemd standardization.
+    # cut down on network chatter that will be useless in most cases.
     operatingsystem = nil
 
-    operatingsystem = if Facter.value(:kernel) == "GNU/kFreeBSD"
-      "GNU/kFreeBSD"
-    elsif Facter::Util::FileRead.exists?('/etc/debian_version')
-      case Facter::Core::Execution.exec('lsb_release -i')
-      when /Ubuntu/i
-        'Ubuntu'
-      when /LinuxMint/i
-        'LinuxMint'
-      else
-        'Debian'
+    # Determine OS name from /etc/os-release if it exists.
+    #
+    # see: https://www.freedesktop.org/software/systemd/man/os-release.html
+    if Facter::Util::FileRead.exists?('/etc/os-release')
+      os_release = Facter::Util::FileRead.read('/etc/os-release')
+      # NOTE: The ID field is used instead of NAME as ID was explicitly
+      # designed to be parsed by scripts whereas NAME is for human consumption.
+      os_id = os_release.lines.find {|l| l.start_with?('ID=')}
+
+      unless os_id.nil?
+        operatingsystem = case os_id
+                          when /debian/i
+                            'Debian'
+                          when /ubuntu/i
+                            'Ubuntu'
+                          when /opensuse/i
+                            'OpenSuSE'
+                          when /sles/i
+                            'SLES'
+                          when /fedora/i
+                            'Fedora'
+                          when /centos/i
+                            'CentOS'
+                          when /ol/i
+                            'OracleLinux'
+                          when /rhel/i
+                            'RedHat'
+                          when /amzn/i
+                            'Amazon'
+                          else
+                            os_id.scan(/^(?:\w+)=[\"']?(.+?)[\"']?$/).flatten.first
+                          end
+      end
+    end
+
+    if operatingsystem.nil?
+      operatingsystem = if Facter.value(:kernel) == "GNU/kFreeBSD"
+        "GNU/kFreeBSD"
+      elsif Facter::Util::FileRead.exists?('/etc/debian_version')
+        case Facter::Core::Execution.exec('lsb_release -i')
+        when /Ubuntu/i
+          'Ubuntu'
+        when /LinuxMint/i
+          'LinuxMint'
+        else
+          'Debian'
+        end
       end
     end
 
