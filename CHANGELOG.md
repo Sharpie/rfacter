@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Timing of fact resolutions has been re-added. The `rfacter` CLI also accepts
   a `--timing` flag.
 - A suite of Acceptance tests powered by beaker-rspec.
+- The `/etc/os-release` file is now parsed when determining `os.name` for Linux.
 
 ### Removed
 - The `ldapname` option has been retired from RFacter::Util::Fact.
