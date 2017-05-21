@@ -11,6 +11,6 @@ RSpec.shared_context 'mock rfacter configuration' do
   before(:each) do
     allow(RFacter::Config).to receive(:config).and_return(config)
     allow(config).to receive(:logger).and_return(logger)
-    allow(config).to receive(:timing).and_return(false)
+    allow(config).to receive(:trace).and_return(false)
   end
 end

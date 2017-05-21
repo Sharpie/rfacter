@@ -83,7 +83,7 @@ module RFacter::Core::Resolvable
   private
 
   def with_timing
-    unless @config.timing
+    unless @config.trace
       yield
     else
       starttime = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)

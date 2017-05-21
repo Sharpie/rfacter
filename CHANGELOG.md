@@ -14,8 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     simplifies per-node caching behavior.
 
 ### Added
-- Timing of fact resolutions has been re-added. The `rfacter` CLI also accepts
-  a `--timing` flag.
+- Timing of fact resolutions has been re-added. This can be enabled by passing
+  the `--trace` flag to the `rfacter` CLI.
 - A suite of Acceptance tests powered by beaker-rspec.
 - The `/etc/os-release` file is now parsed when determining `os.name` for Linux.
 
