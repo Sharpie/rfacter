@@ -1,5 +1,5 @@
 require 'rfacter/node'
-require 'rfacter/util/collection'
+require 'rfacter/factset'
 
 require 'pp' # For pretty-printing
 
@@ -21,12 +21,8 @@ node_urls = [
 ]
 
 nodes = node_urls.map {|u| RFacter::Node.new(u) }
+factset = RFacter::Factset.new(nodes)
 
-fact_data = nodes.each_with_object({}) do |node, hash|
-  facts = RFacter::Util::Collection.new(node)
-  facts.load_all # Load all fact definitions
-
-  hash[node.hostname] = facts.to_hash
-end
+fact_data = factset.to_hash.value
 
 puts PP.pp(fact_data, '')

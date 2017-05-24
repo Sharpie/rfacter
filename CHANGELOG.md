@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     the `--profile` flag to the `rfacter` CLI.
   - A suite of Acceptance tests powered by beaker-rspec.
   - The `/etc/os-release` file is now parsed when determining `os.name` for Linux.
+  - The `RFacter::Factset` class which is capable of coordinating the
+    concurrent resolution of facts across a number of nodes. This is the
+    preferred interface for retrieving fact data.
 
 ### Removed
 

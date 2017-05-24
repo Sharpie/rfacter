@@ -1,5 +1,7 @@
 require 'forwardable'
 
+require 'concurrent'
+
 require 'rfacter'
 require_relative '../config'
 require_relative '../dsl'
@@ -14,6 +16,7 @@ require_relative 'fact'
 # @api private
 # @since 0.1.0
 class RFacter::Util::Collection
+  include Concurrent::Async
   # Ensures unqualified namespaces like `Facter` and `Facter::Util` get
   # re-directed to RFacter shims when the loader calls `instance_eval`
   include RFacter::DSL

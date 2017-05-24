@@ -5,6 +5,7 @@ require 'rfacter'
 
 require_relative 'config'
 require_relative 'node'
+require_relative 'factset'
 require_relative 'util/collection'
 
 # RFacter Command Line Interface module
@@ -26,23 +27,15 @@ module RFacter::CLI
 
     logger.info('cli::run') { "Configured nodes: #{@config.nodes.values.map(&:hostname)}" }
 
-    facts = @config.nodes.values.each_with_object({}) do |node, h|
-      collection = RFacter::Util::Collection.new(node)
-      collection.load_all
+    factset = RFacter::Factset.new(@config.nodes.values)
 
-      node_facts = if names.empty?
-        collection.to_hash
-      else
-        names.each_with_object({}) do |name, n|
-          n[name] = collection.value(name)
-        end
-      end
+    node_facts = if names.empty?
+                   factset.to_hash
+                 else
+                   factset.value(names)
+                 end
 
-      h[node.hostname] = node_facts
-    end
-
-
-    puts JSON.pretty_generate(facts)
+    puts JSON.pretty_generate(node_facts)
 
     exit 0
   end
