@@ -29,7 +29,7 @@ class RFacter::Factset
     @config = config
 
     @collections = nodes.each_with_object({}) do |node, hash|
-      hash[node.hostname] = RFacter::Util::Collection.new(node)
+      hash[node.id] = RFacter::Util::Collection.new(node)
     end
   end
 

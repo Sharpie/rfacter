@@ -3,26 +3,25 @@ require 'spec_helper_acceptance'
 require 'cgi'
 
 require 'rfacter/node'
-require 'rfacter/util/collection'
+require 'rfacter/factset'
 
 describe RFacter do
   before(:all) do
-    @facts = hosts.each_with_object({}) do |host, hash|
+    nodes = hosts.map do |host|
       config = host.host_hash
       ip = config[:ip]
       username = config[:user]
       port = config[:port]
       password = config[:ssh][:password]
 
-      node = RFacter::Node.new("ssh://#{username}:#{CGI.escape(password)}@#{ip}:#{port}")
-
-      collection = RFacter::Util::Collection.new(node)
-      collection.load_all
-
-      # NOTE: Get hostname from Beaker host since these will all be sharing the
-      # same IP address.
-      hash[host.hostname] = collection.to_hash
+      RFacter::Node.new("ssh://#{username}:#{CGI.escape(password)}@#{ip}:#{port}",
+        # NOTE: Get hostname from Beaker host since these will all be sharing
+        # the same IP address.
+        id: host.hostname)
     end
+
+    factset = RFacter::Factset.new(nodes)
+    @facts = factset.to_hash
   end
 
   hosts.each do |host|

@@ -25,7 +25,7 @@ module RFacter::CLI
       @config.nodes['localhost'] = RFacter::Node.new('localhost')
     end
 
-    logger.info('cli::run') { "Configured nodes: #{@config.nodes.values.map(&:hostname)}" }
+    logger.info('cli::run') { "Configured nodes: #{@config.nodes.values.map(&:id)}" }
 
     factset = RFacter::Factset.new(@config.nodes.values)
 

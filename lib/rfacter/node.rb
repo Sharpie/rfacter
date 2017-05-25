@@ -35,10 +35,17 @@ class RFacter::Node
   attr_reader :password
   # @return [Hash]
   attr_reader :options
+  # @return [String]
+  attr_reader :id
 
   attr_reader :transport
 
-  def initialize(uri, config: RFacter::Config.config, **opts)
+  # Returns a new instance of Node
+  #
+  # @param uri [URI] The URI of the node.
+  # @param id [String, nil] An optional string to use when identifying
+  #   this node.
+  def initialize(uri, id: nil, config: RFacter::Config.config, **opts)
     @config = config
 
     @uri = unless uri.is_a?(URI)
@@ -67,6 +74,20 @@ class RFacter::Node
     @password = CGI.unescape(@uri.password) unless @uri.password.nil?
     @options = @uri.query.nil? ? Hash.new : CGI.parse(@uri.query)
     @options.update(opts)
+
+    @id = unless id.nil?
+            id
+          else
+            # Create a default from the URI, minus the password and options
+            # components.
+            id_string = "#{@scheme}://"
+            id_string += "#{@user}@" unless @user.nil?
+            id_string += @hostname
+            id_string += ":#{@port}" unless @port.nil?
+            id_string
+          end
+
+    @id.freeze
 
     # TODO: This should be abstracted.
     @transport = Train.create(@scheme,
