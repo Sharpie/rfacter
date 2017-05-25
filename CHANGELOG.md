@@ -14,27 +14,31 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     simplifies per-node caching behavior.
 
 ### Added
-- Timing of fact resolutions has been re-added. This can be enabled by passing
-  the `--profile` flag to the `rfacter` CLI.
-- A suite of Acceptance tests powered by beaker-rspec.
-- The `/etc/os-release` file is now parsed when determining `os.name` for Linux.
+
+  - Timing of fact resolutions has been re-added. This can be enabled by passing
+    the `--profile` flag to the `rfacter` CLI.
+  - A suite of Acceptance tests powered by beaker-rspec.
+  - The `/etc/os-release` file is now parsed when determining `os.name` for Linux.
 
 ### Removed
-- The `ldapname` option has been retired from RFacter::Util::Fact.
+
+  - The `ldapname` option has been retired from RFacter::Util::Fact.
 
 
 ## [0.0.1] - 2017-05-10
 ### Added
-- A formal DSL for custom facts based on the [Facter 3 Ruby API][facter-3-api].
-- Support for resolving facts on remote nodes over transports such as SSH
-  and WinRM.
-- Partial implementation of the `os` and `networking` facts from Facter 3.
+
+  - A formal DSL for custom facts based on the [Facter 3 Ruby API][facter-3-api].
+  - Support for resolving facts on remote nodes over transports such as SSH
+    and WinRM.
+  - Partial implementation of the `os` and `networking` facts from Facter 3.
 
 ### Removed
-- Loading of facts from `ENV` variables and the Ruby `LOAD_PATH`.
-- Support for external facts.
-- All core facts from Ruby 2.4. These will be re-added in later releases
-  on a case-by-case basis.
+
+  - Loading of facts from `ENV` variables and the Ruby `LOAD_PATH`.
+  - Support for external facts.
+  - All core facts from Ruby 2.4. These will be re-added in later releases
+    on a case-by-case basis.
 
 [facter-3-api]: https://github.com/puppetlabs/facter/blob/master/Extensibility.md#custom-facts-compatibility
 
