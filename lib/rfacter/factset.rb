@@ -106,4 +106,11 @@ class RFacter::Factset
   def to_hash
     fetch_all.value
   end
+
+  # Flush cached fact values
+  #
+  # @return [void]
+  def flush
+    @collections.values.each {|c| c.flush}
+  end
 end
