@@ -52,15 +52,15 @@ describe RFacter::Core::Resolvable do
       expect(subject.value).to eq nil
     end
 
-    it 'does not collect measurements when trace is disabled' do
-      allow(config).to receive(:trace).and_return(false)
+    it 'does not collect measurements when profiling is disabled' do
+      allow(config).to receive(:profile).and_return(false)
       expect(Process).to receive(:clock_gettime).never
 
       subject.value
     end
 
-    it 'logs elapsed time when timining is enabled' do
-      allow(config).to receive(:trace).and_return(true)
+    it 'logs elapsed time when profiling is enabled' do
+      allow(config).to receive(:profile).and_return(true)
       expect(logger).to receive(:info)
 
       subject.value

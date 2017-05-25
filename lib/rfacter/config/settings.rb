@@ -23,16 +23,16 @@ class RFacter::Config::Settings
   #   schemes to use when contacting them.
   attr_reader :nodes
 
-  # A boolean switch for enabling execution tracing
+  # A boolean switch for enabling execution profiling
   #
   # @return [Boolean] Defaults to false.
-  attr_accessor :trace
+  attr_accessor :profile
 
   def initialize(**options)
     @logger = RFacter::Util::Logger.new($stderr)
     @logger.level = Logger::WARN
 
-    @trace = false
+    @profile = false
     @nodes = Hash.new
   end
 end

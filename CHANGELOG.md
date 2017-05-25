@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Timing of fact resolutions has been re-added. This can be enabled by passing
-  the `--trace` flag to the `rfacter` CLI.
+  the `--profile` flag to the `rfacter` CLI.
 - A suite of Acceptance tests powered by beaker-rspec.
 - The `/etc/os-release` file is now parsed when determining `os.name` for Linux.
 

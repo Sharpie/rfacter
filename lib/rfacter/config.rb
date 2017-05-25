@@ -76,8 +76,8 @@ module RFacter::Config
       settings.logger.level = Logger::DEBUG
     end
 
-    parser.on('-t', '--trace', 'Trace fact resolution times.') do
-      settings.trace = true
+    parser.on('--profile', 'Profile fact resolution times.') do
+      settings.profile = true
     end
 
     parser.on('-n', '--node', '=MANDATORY', URI, 'Add a node by URI.') do |uri|
