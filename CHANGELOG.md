@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
 ## [Unreleased]
+
+
+## [0.1.0] - 2017-05-25
 ### Breaking Changes
 
   - The `RFacter::Util::Collection` class now requires a `RFacter::Node`
@@ -45,5 +49,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [facter-3-api]: https://github.com/puppetlabs/facter/blob/master/Extensibility.md#custom-facts-compatibility
 
-[Unreleased]: https://github.com/Sharpie/rfacter/compare/0.0.1...HEAD
+[Unreleased]: https://github.com/Sharpie/rfacter/compare/0.1.0...HEAD
+[0.1.0]: https://github.com/Sharpie/rfacter/compare/0.0.1...0.1.0
 [0.0.1]: https://github.com/Sharpie/rfacter/compare/7ceb3e9...0.0.1
