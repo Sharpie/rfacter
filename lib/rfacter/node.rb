@@ -135,7 +135,7 @@ class RFacter::Node
     result = if connection.os.windows?
       connection.run_command("(Get-Command -TotalCount 1 #{executable}).Path")
     else
-      connection.run_command("which #{executable}")
+      connection.run_command("command -v #{executable}")
     end
 
     if (result.exit_status != 0) || (result.stdout.chomp.empty?)
