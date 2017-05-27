@@ -1,11 +1,11 @@
 require 'rfacter'
 
-# Routines for normalizing fact return values
-#
-# @api private
-# @since 0.1.0
 module RFacter
   module Util
+    # Routines for normalizing fact return values
+    #
+    # @api private
+    # @since 0.1.0
     module Normalization
       class NormalizationError < StandardError; end
 
