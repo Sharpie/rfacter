@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+  - Use the shell builtin `command -v` instead of `which` when searching for
+    executables on POSIX systems.
+
 
 ## [0.1.0] - 2017-05-25
 ### Breaking Changes
