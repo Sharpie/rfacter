@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.1.1] - 2017-05-31
 ### Fixed
 
   - Use the shell builtin `command -v` instead of `which` when searching for
@@ -56,6 +58,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [facter-3-api]: https://github.com/puppetlabs/facter/blob/master/Extensibility.md#custom-facts-compatibility
 
-[Unreleased]: https://github.com/Sharpie/rfacter/compare/0.1.0...HEAD
+[Unreleased]: https://github.com/Sharpie/rfacter/compare/0.1.1...HEAD
+[0.1.1]: https://github.com/Sharpie/rfacter/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/Sharpie/rfacter/compare/0.0.1...0.1.0
 [0.0.1]: https://github.com/Sharpie/rfacter/compare/7ceb3e9...0.0.1
