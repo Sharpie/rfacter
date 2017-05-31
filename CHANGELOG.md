@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Use the shell builtin `command -v` instead of `which` when searching for
     executables on POSIX systems.
 
+  - Fix misspelled Facter::Util::FileRead reference in the os fact for Solaris.
+
 
 ## [0.1.0] - 2017-05-25
 ### Breaking Changes

@@ -586,7 +586,7 @@ Facter.add(:os, :type => :aggregate) do
   end
 
   chunk(:release, require: [:name]) do |osname|
-    full = if (release = Facter::Util::FileFread.read('/etc/release'))
+    full = if (release = Facter::Util::FileRead.read('/etc/release'))
       line = release.split("\n").first
 
       # Solaris 10: Solaris 10 10/09 s10x_u8wos_08a X86
