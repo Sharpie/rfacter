@@ -157,39 +157,3 @@ class RFacter::Node
     connection.file(path)
   end
 end
-
-
-# Hello dear reader. Hiding at the bottom of this file is a consequence of bad
-# design decisions in Ruby --- specifically the Kernel.autoload feature. Train
-# uses autload to lazily require its subcomponents. However, autoload plays
-# filthy tricks with the resolution of Constants that are not thread-safe. So,
-# this chunk of code is sitting down here out of sight to force these autoloads
-# to be resolved up front so that we can get on with the business of actually
-# saving significant time by using parallelism.
-#
-# See:
-#   http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-core/41149
-#   http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-core/20238
-#
-# TODO: Remove if this PR lands:
-#   https://github.com/chef/train/pull/178
-require 'train/plugins/transport'
-require 'train/plugins/base_connection'
-
-require 'train/transports/ssh'
-require 'train/transports/ssh_connection'
-require 'train/transports/winrm'
-require 'train/transports/winrm_connection'
-require 'train/transports/local'
-require 'train/transports/local_file'
-require 'train/transports/local_os'
-
-require 'train/extras'
-require 'train/extras/command_wrapper'
-require 'train/extras/file_common'
-require 'train/extras/file_unix'
-require 'train/extras/file_aix'
-require 'train/extras/file_linux'
-require 'train/extras/file_windows'
-require 'train/extras/os_common'
-require 'train/extras/stat'

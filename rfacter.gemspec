@@ -22,7 +22,7 @@ EOS
   s.bindir = 'bin'
   s.executables = ['rfacter']
 
-  s.add_dependency 'train',                                     '~> 0.23.0'
+  s.add_dependency 'train',                                     '~> 0.25.0'
   s.add_dependency 'concurrent-ruby',                           '~> 1.0'
 
   s.add_development_dependency 'rake',                          '~> 12.0'
