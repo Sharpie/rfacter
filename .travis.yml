@@ -6,16 +6,16 @@ notifications:
   email: false
 matrix:
   include:
-    - rvm: 2.1.9
+    - rvm: 2.3.5
       bundler_args: '--without acceptance'
       script: 'bundle exec rake spec:unit'
-    - rvm: 2.3.4
+    - rvm: 2.4.1
       bundler_args: '--without acceptance'
       script: 'bundle exec rake spec:unit'
     - rvm: jruby-9.1.5.0
       bundler_args: '--without acceptance'
       script: 'bundle exec rake spec:unit'
-    - rvm: 2.3.4
+    - rvm: 2.4.1
       sudo: required
       services:
         - docker

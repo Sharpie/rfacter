@@ -10,7 +10,7 @@ RFacter is a library for collecting facts from remote system(s) by executing
 commands over transports such as SSH and WinRM.
 EOS
 
-  s.required_ruby_version = '>= 2.1.0'
+  s.required_ruby_version = '>= 2.3.0'
 
   s.license = 'Apache-2.0'
   s.authors = ['Charlie Sharpsteen', 'Puppet Labs']

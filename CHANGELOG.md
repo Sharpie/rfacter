@@ -6,7 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [Unreleased]
+### Breaking Changes
 
+  - The minimum required Ruby version has been moved from 2.1 to 2.3.
+    This is necessary to prevent breaks in compatibility with upstream
+    dependencies that are dropping support for Ruby versions that have
+    hit end of life.
 
 ## [0.1.1] - 2017-05-31
 ### Fixed
