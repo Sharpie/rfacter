@@ -6,7 +6,7 @@ notifications:
   email: false
 matrix:
   include:
-    - rvm: 2.3.5
+    - rvm: 2.3.7
       bundler_args: '--without acceptance'
       script: 'bundle exec rake spec:unit'
     - rvm: 2.4.4
