@@ -9,13 +9,13 @@ matrix:
     - rvm: 2.3.7
       bundler_args: '--without acceptance'
       script: 'bundle exec rake spec:unit'
-    - rvm: 2.4.4
+    - rvm: 2.4.1
       bundler_args: '--without acceptance'
       script: 'bundle exec rake spec:unit'
     - rvm: jruby-9.1.17.0
       bundler_args: '--without acceptance'
       script: 'bundle exec rake spec:unit'
-    - rvm: 2.4.4
+    - rvm: 2.4.1
       sudo: required
       services:
         - docker
