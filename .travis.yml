@@ -12,7 +12,7 @@ matrix:
     - rvm: 2.4.4
       bundler_args: '--without acceptance'
       script: 'bundle exec rake spec:unit'
-    - rvm: jruby-9.1.5.0
+    - rvm: jruby-9.1.17.0
       bundler_args: '--without acceptance'
       script: 'bundle exec rake spec:unit'
     - rvm: 2.4.4
