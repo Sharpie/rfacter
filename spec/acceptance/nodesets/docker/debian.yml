@@ -27,17 +27,22 @@ HOSTS:
     image: ubuntu:18.04
     docker_preserve_image: true
     docker_cmd: '["/sbin/init"]'
-# FIXME: Disabled because sshd doesn't come up when the container is
-# booted. This causes Beaker to hang indefinitely tryng to establish a
-# connection.
-# ubuntu1404:
-#   platform: ubuntu-14.04-amd64
-#   hypervisor: docker
-#   image: ubuntu:14.04
-#   docker_preserve_image: true
-#   docker_cmd: '["/sbin/init"]'
-#   docker_image_commands:
-#     - 'sudo update-rc.d ssh defaults'
+  # NOTE: The 14.04 test uses images from ubuntu-upstart which layer on top of
+  #       the official ubuntu images. The Upstart init system hasn't gotten any
+  #       development to make it docker-compatible. Upstart needs some additional
+  #       help in the form of a dummy service that executes `initctl emit` to
+  #       simulate a normal boot sequence. These emitted events cause Upstart
+  #       to execute items that are normally skipped when launched directly
+  #       from `/sbin/init`. Such as signalling a runlevel so that `rc.d`
+  #       scripts are executed.
+  ubuntu1404:
+    platform: ubuntu-14.04-amd64
+    hypervisor: docker
+    image: ubuntu-upstart:14.04
+    docker_preserve_image: true
+    docker_cmd: '["/sbin/init"]'
+    docker_image_commands:
+      - 'sudo update-rc.d ssh defaults'
 
 CONFIG:
   # Beaker requirements are layered into the docker image at provision time.
