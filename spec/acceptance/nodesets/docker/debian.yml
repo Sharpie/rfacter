@@ -12,6 +12,12 @@ HOSTS:
     image: ubuntu:16.04
     docker_preserve_image: true
     docker_cmd: '["/sbin/init"]'
+  ubuntu1804:
+    platform: ubuntu-18.04-amd64
+    hypervisor: docker
+    image: ubuntu:18.04
+    docker_preserve_image: true
+    docker_cmd: '["/sbin/init"]'
 # FIXME: Disabled because sshd doesn't come up when the container is
 # booted. This causes Beaker to hang indefinitely tryng to establish a
 # connection.
