@@ -6,6 +6,15 @@ HOSTS:
     image: debian:8
     docker_preserve_image: true
     docker_cmd: '["/sbin/init"]'
+  debian9:
+    platform: debian-8-amd64
+    hypervisor: docker
+    image: debian:9
+    docker_preserve_image: true
+    docker_image_commands:
+      # Provides /sbin/init
+      - 'apt-get install -y systemd-sysv'
+    docker_cmd: '["/sbin/init"]'
   ubuntu1604:
     platform: ubuntu-16.04-amd64
     hypervisor: docker
