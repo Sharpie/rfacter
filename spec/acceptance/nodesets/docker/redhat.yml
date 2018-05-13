@@ -1,9 +1,9 @@
 ---
 HOSTS:
-  fedora25:
-    platform: fedora-25-x86_64
+  fedora28:
+    platform: fedora-28-x86_64
     hypervisor: docker
-    image: fedora:25
+    image: fedora:28
     docker_preserve_image: true
     docker_cmd: '["/sbin/init"]'
   centos7:
